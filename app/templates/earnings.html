@@ -3,28 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/checkout.css') }}">
+    <title>Earnings | ViteGo</title>
+    
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/modern_shared.css') }}">
+    
+    <style>
+        .earnings-layout {
+            max-width: 800px;
+            margin: 1rem auto 0;
+        }
+        
+        .success-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05));
+            border: 2px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        .success-header {
+            text-align: center;
+            padding: 1.5rem;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .success-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            animation: bounce 1s ease-in-out;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .success-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #10b981;
+            margin-bottom: 0.25rem;
+        }
+        
+        .success-subtitle {
+            color: #57534e;
+            font-size: 0.95rem;
+        }
+        
+        .earnings-details {
+            padding: 1rem;
+        }
+        
+        .earnings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 16px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .earnings-label {
+            font-size: 0.9rem;
+            color: #78716c;
+            font-weight: 500;
+        }
+        
+        .earnings-value {
+            font-size: 1rem;
+            color: #1c1917;
+            font-weight: 600;
+        }
+        
+        .total-earnings {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.1));
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            padding: 1rem;
+        }
+        
+        .total-label {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1c1917;
+        }
+        
+        .total-amount {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #10b981;
+        }
+        
+        .earnings-actions {
+            padding: 1rem;
+            border-top: 2px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+        
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1c1917;
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-text {
+            color: #57534e;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
 </head>
 <body>
-    <div class="black-block">
-        <img src="{{ url_for('static', filename='uber_logo.png') }}" alt="Your Logo" class="logo">
-    </div>
-    <div class="container">
-        <h1 class="text-center">Ride Invoice</h1>
-
-        {% if trip_cost %}
-            <div>
-                <p>Ride ID: {{ ride_id }}</p>
-                <p>Earnings: ${{ trip_cost }}</p>
+    <!-- Modern Navigation -->
+    <nav class="modern-nav">
+        <div class="nav-container">
+            <a href="{{ url_for('welcome') }}" class="nav-logo" onclick="localStorage.clear(); sessionStorage.clear();">Vite<span>Go</span></a>
+            <div class="nav-actions">
+                <span class="nav-user">💰 Earnings</span>
+                <a href="{{ url_for('home', role='driver') }}" class="nav-btn nav-btn-secondary">Dashboard</a>
             </div>
-        {% else %}
-            <p>No earnings data available.</p>
-        {% endif %}
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="modern-container">
+        <div class="earnings-layout">
+            {% if trip_cost %}
+            <!-- Success Card -->
+            <div class="modern-card success-card fade-in">
+                <div class="success-header">
+                    <div class="success-icon">🎉</div>
+                    <h1 class="success-title">Ride Completed!</h1>
+                    <p class="success-subtitle">Congratulations on completing this ride</p>
+                </div>
+                
+                <div class="earnings-details">
+                    <div class="earnings-row">
+                        <span class="earnings-label">🎫 Ride ID</span>
+                        <span class="earnings-value">{{ ride_id }}</span>
+                    </div>
+                    
+                    <div class="earnings-row">
+                        <span class="earnings-label">📅 Date</span>
+                        <span class="earnings-value">{{ now.strftime('%B %d, %Y') if now else 'Today' }}</span>
+                    </div>
+                    
+                    <div class="earnings-row">
+                        <span class="earnings-label">⏱️ Status</span>
+                        <span class="earnings-value">✓ Completed</span>
+                    </div>
+                    
+                    <div class="earnings-row total-earnings">
+                        <span class="total-label">💵 Your Earnings</span>
+                        <span class="total-amount">${{ trip_cost }}</span>
+                    </div>
+                </div>
+                
+                <div class="earnings-actions">
+                    <a href="{{ url_for('home', role='driver') }}" class="btn-modern btn-modern-primary" style="flex: 1; text-decoration: none;">
+                        🚗 Accept More Rides
+                    </a>
+                    <a href="{{ url_for('welcome') }}" class="btn-modern btn-modern-secondary" style="flex: 1; text-decoration: none;">
+                        🏠 Go Home
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <!-- Earnings Dashboard / History -->
+            <div class="modern-card fade-in" style="padding: 2rem;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 2rem;">
+                    <div class="invoice-icon" style="margin-bottom: 0;">📊</div>
+                    <h2 class="invoice-title" style="margin: 0;">Earnings Dashboard</h2>
+                </div>
+                
+                <div class="earnings-row total-earnings" style="margin-bottom: 2rem; border-radius: 16px;">
+                    <span class="total-label">💵 Lifetime Earnings</span>
+                    <span class="total-amount">${{ "%.2f"|format(total_earnings) }}</span>
+                </div>
+                
+                {% if past_rides and past_rides|length > 0 %}
+                    <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.25rem; font-weight: 600; color: #334155; margin-bottom: 1rem;">Completed Rides</h3>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        {% for ride in past_rides %}
+                        <div class="earnings-row" style="flex-direction: column; align-items: stretch; gap: 0.75rem; margin-bottom: 0; padding: 1.25rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                                <span class="earnings-label" style="min-width: 60px;">📍 From:</span>
+                                <span class="earnings-value" style="font-size: 0.9rem; text-align: right; line-height: 1.4;">{{ ride.get('origin', 'N/A') }}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                                <span class="earnings-label" style="min-width: 60px;">🎯 To:</span>
+                                <span class="earnings-value" style="font-size: 0.9rem; text-align: right; line-height: 1.4;">{{ ride.get('destination', 'N/A') }}</span>
+                            </div>
+                            
+                            <div style="height: 1px; background: rgba(0,0,0,0.05); margin: 0.25rem 0;"></div>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; gap: 1.5rem;">
+                                    {% if ride.get('pickup_time') %}
+                                    <div style="display: flex; flex-direction: column;">
+                                        <span class="earnings-label" style="font-size: 0.75rem;">Time</span>
+                                        <span class="earnings-value" style="font-size: 0.85rem; color: #57534e;">{{ ride.get('pickup_time') }}</span>
+                                    </div>
+                                    {% endif %}
+                                    <div style="display: flex; flex-direction: column;">
+                                        <span class="earnings-label" style="font-size: 0.75rem;">Passenger</span>
+                                        <span class="earnings-value" style="font-size: 0.85rem; color: #10b981;">{{ ride.get('username', 'N/A') }}</span>
+                                    </div>
+                                </div>
+                                {% if ride.get('trip_cost') %}
+                                <div style="text-align: right;">
+                                    <span class="earnings-value" style="color: #10b981; font-size: 1.25rem;">+${{ ride.get('trip_cost') }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state" style="padding: 1rem;">
+                        <p class="empty-text" style="font-size: 1.1rem;">You haven't completed any rides yet.</p>
+                    </div>
+                {% endif %}
+                
+                <div style="margin-top: 2rem; text-align: center;">
+                    <a href="{{ url_for('home', role='driver') }}" class="btn-modern btn-modern-primary" style="display: inline-flex;">
+                        Dashboard
+                        <span style="margin-left: 0.5rem;">→</span>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Modern Shared JS -->
+    <script src="{{ url_for('static', filename='scripts/modern_shared.js') }}"></script>
 </body>
 </html>

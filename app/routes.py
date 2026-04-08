@@ -1,5 +1,6 @@
 from flask import render_template, request, flash, redirect, url_for, jsonify, session
-from flask_login import LoginManager, UserMixin, login_user, login_required, current_user
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email
@@ -29,8 +30,6 @@ mail = Mail(app)
 socketio = SocketIO(app)
 
 db, chat_collection = setup_mongo()
-
-login_manager.init_app(app)
 
 setup_sqlite()
 
@@ -105,6 +104,15 @@ def login():
     return render_template('login.html', form=form)
 
 
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    session.clear()
+    flash('You have been logged out successfully.', 'info')
+    return redirect(url_for('welcome'))
+
+
 @app.route('/home')
 @login_required
 def home():
@@ -118,11 +126,24 @@ def home():
 
         return render_template('user_home.html', response_time=response_time)
     elif role == 'driver':
-        ride_requests = db['rides'].find({"status": "requested"})
+        ride_requests = list(db['rides'].find({"status": "requested"}))
+        
+        completed_rides = list(db['rides'].find({"status": {"$in": ["completed", "confirmed"]}}))
+        today_earn = 0.0
+        for ride in completed_rides:
+            # Fallback for old rides missing driver_username:
+            if ride.get('driver_username') == current_user.username or not ride.get('driver_username'):
+                cost = ride.get('trip_cost')
+                if cost:
+                    try:
+                        today_earn += float(str(cost).replace('$', '').replace(',', ''))
+                    except Exception:
+                        pass
+                    
         end_time = time.time()
         response_time = end_time - start_time
 
-        return render_template('driver_home.html', user=current_user, ride_requests=ride_requests, response_time=response_time)
+        return render_template('driver_home.html', user=current_user, ride_requests=ride_requests, response_time=response_time, today_earn=today_earn)
     else:
         end_time = time.time()
         response_time = end_time - start_time
@@ -132,6 +153,12 @@ def home():
 
 @app.route('/')
 def welcome():
+    if current_user.is_authenticated:
+        logout_user()
+        session.clear()
+        flash('You have been logged out successfully.', 'info')
+    else:
+        session.clear()
     return render_template('welcome.html')
 
 from flask import request, jsonify
@@ -139,6 +166,7 @@ from flask import request, jsonify
 from flask import session
 
 @app.route('/save_ride', methods=['POST'])
+@login_required
 def save_ride():
     ride_data = request.get_json()
 
@@ -151,6 +179,8 @@ def save_ride():
     origin_lat = ride_data.get('origin_lat')
     origin_lng = ride_data.get('origin_lng')
     trip_cost = ride_data.get('tripCost') 
+    # Scheduled pickup time (sent from frontend as a string, e.g. "YYYY-MM-DD HH:mm")
+    pickup_time = ride_data.get('pickup_time') or ride_data.get('pickupTime')
 
     rides_collection = db["rides"]
 
@@ -162,7 +192,8 @@ def save_ride():
         "destination": destination,
         "origin_lat": origin_lat,
         "origin_lng": origin_lng,
-        "trip_cost": trip_cost  
+        "trip_cost": trip_cost,
+        "pickup_time": pickup_time,
     }
 
     result = rides_collection.insert_one(ride_entry)
@@ -178,7 +209,7 @@ def save_ride():
 @login_required
 def confirm_ride(ride_id):
     try:
-        result = db['rides'].update_one({'_id': ObjectId(ride_id), 'status': 'requested'}, {'$set': {'status': 'confirmed'}})
+        result = db['rides'].update_one({'_id': ObjectId(ride_id), 'status': 'requested'}, {'$set': {'status': 'confirmed', 'driver_username': current_user.username}})
 
         if result.modified_count > 0:
             session['confirmed_ride_id'] = ride_id
@@ -194,6 +225,26 @@ def chat():
     role = session.get('role', 'user')
     current_username = current_user.username
 
+    has_ride = False
+    trip_cost = None
+    if role == 'user':
+        # Allow confirmed rides so users can still see the chat and payment button
+        user_ride = db['rides'].find_one({"username": current_username, "status": {"$in": ["requested", "confirmed"]}}, sort=[("_id", -1)])
+        if user_ride:
+            has_ride = True
+            trip_cost = user_ride.get('trip_cost')
+    else:
+        # Driver: Fetch active ride directly from the database first, fallback to session
+        driver_ride = db['rides'].find_one({"driver_username": current_username, "status": "confirmed"}, sort=[("_id", -1)])
+        if driver_ride:
+            has_ride = True
+            confirmed_ride_id = str(driver_ride['_id'])
+            session['confirmed_ride_id'] = confirmed_ride_id # Refresh session
+        else:
+            confirmed_ride_id = session.get('confirmed_ride_id')
+            if confirmed_ride_id:
+                has_ride = True
+
     chat_history = db['chat_history'].find(
         {"$or": [{"sender": current_username}, {"receiver": current_username}]},
         {"_id": 0}
@@ -203,7 +254,7 @@ def chat():
 
     requested_ride_id = session.get('requested_ride_id')
 
-    return render_template('chat.html', user=current_user, role=role, chat_history=chat_history, confirmed_ride_id=confirmed_ride_id, requested_ride_id=requested_ride_id)
+    return render_template('chat.html', user=current_user, role=role, chat_history=chat_history, confirmed_ride_id=confirmed_ride_id, requested_ride_id=requested_ride_id, has_ride=has_ride, trip_cost=trip_cost)
 
 @socketio.on('send_message')
 def handle_message(messageData):
@@ -272,11 +323,10 @@ def payment():
 
     if trip_cost is not None:
         user_email = current_user.email
-
-        return render_template('payment.html', trip_cost=trip_cost, user_email=user_email)
+        return render_template('payment.html', trip_cost=trip_cost, user_email=user_email, now=datetime.now())
     else:
-        flash("No trip cost available.", "error")
-        return render_template('payment.html', trip_cost=None, user_email=None)
+        past_rides = list(db['rides'].find({"username": current_user.username}).sort("_id", -1))
+        return render_template('payment.html', trip_cost=None, user_email=None, past_rides=past_rides, now=datetime.now())
 
 def get_user_email(user_id):
     with sqlite3.connect("database.db") as con:
@@ -306,6 +356,12 @@ def confirm_payment():
             trip_cost = session.get('trip_cost', 'N/A')
 
             if trip_cost != 'N/A':
+                # Mark ride as completed in DB so it ends
+                db['rides'].update_one(
+                    {'username': current_user.username, 'status': {'$in': ['requested', 'confirmed']}},
+                    {'$set': {'status': 'completed'}}
+                )
+                
                 send_payment_confirmation_email(user_email, trip_cost)
 
                 flash("Payment confirmed. An email has been sent to your email address.", "success")
@@ -325,18 +381,40 @@ if __name__ == '__main__':
 @app.route('/earnings')
 @login_required
 def earnings():
-    ride_id = session.get('confirmed_ride_id')
+    ride_id = session.pop('confirmed_ride_id', None)
 
+    trip_cost = None
+    completed_ride = None
     if ride_id:
+        # Mark the ride as completed when the driver clicks Confirm Arrival & Complete Ride
+        db['rides'].update_one({'_id': ObjectId(ride_id)}, {'$set': {'status': 'completed'}})
         ride_data = db['rides'].find_one({'_id': ObjectId(ride_id)})
 
         if ride_data:
             trip_cost = ride_data.get('trip_cost')
+            completed_ride = ride_id
 
-            if trip_cost is not None:
-                return render_template('earnings.html', trip_cost=trip_cost, ride_id=ride_id)
+    # Fetch all completed rides for this driver to show history
+    all_past_rides = list(db['rides'].find({"status": {"$in": ["completed", "confirmed"]}}).sort("_id", -1))
     
-    return render_template('earnings.html', trip_cost=None, ride_id=None)
+    # Filter to only this driver or legacy rides
+    driver_rides = [r for r in all_past_rides if r.get('driver_username') == current_user.username or not r.get('driver_username')]
+    
+    total_earnings = 0.0
+    for ride in driver_rides:
+        cost = ride.get('trip_cost')
+        if cost:
+            try:
+                total_earnings += float(str(cost).replace('$', '').replace(',', ''))
+            except Exception:
+                pass
+
+    return render_template('earnings.html', 
+                           trip_cost=trip_cost, 
+                           ride_id=completed_ride,
+                           past_rides=driver_rides,
+                           total_earnings=total_earnings,
+                           now=datetime.now())
 
 def send_payment_confirmation_email(to_email, payment_info):
     subject = 'Payment Confirmation'
@@ -347,10 +425,4 @@ def send_payment_confirmation_email(to_email, payment_info):
 
     mail.send(msg)
 
-if __name__ == '__main__':
-    start_time = time.time()
-    socketio.run(app, debug=True)
-    end_time = time.time()
 
-    total_time = end_time - start_time
-    print(f"Total time taken: {total_time} seconds")

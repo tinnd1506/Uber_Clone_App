@@ -2,44 +2,68 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Login</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | ViteGo</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/authentication.css') }}">
 </head>
 <body>
-    <div class="black-block">
-        <img src="static/uber_logo.png" alt="Your Logo" class="logo">
-    </div>
-    <div class="container">
-        <form method="POST" id="login-form" action="{{ url_for('login', role=request.args.get('role')) }}">
-            {{ form.hidden_tag() }}
-            <div class="mb-3">
-                <label class="form-label" for="username">{{ form.username.label }}</label><br>
-                {{ form.username(class="form-control", id="username") }}
-                {% for error in form.username.errors %}
-                    <p class="text-danger">{{ error }}</p>
-                {% endfor %}
+    <!-- Navigation -->
+    <nav class="auth-nav">
+        <div class="nav-wrapper">
+            <a href="{{ url_for('welcome') }}" class="logo">Vite<span>Go</span></a>
+        </div>
+    </nav>
+
+    <!-- Login Form -->
+    <div class="auth-container">
+        <div class="auth-card fade-in">
+            <div class="auth-header">
+                <h1 class="auth-title">Welcome Back</h1>
+                <p class="auth-subtitle">Login to continue your journey</p>
             </div>
-            <div class="mb-3">
-                <label class="form-label" for="password">{{ form.password.label }}</label><br>
-                {{ form.password(class="form-control", id="password") }}
-                {% for error in form.password.errors %}
-                    <p class="text-danger">{{ error }}</p>
-                {% endfor %}
+
+            <form method="POST" id="login-form" action="{{ url_for('login', role=request.args.get('role')) }}" class="auth-form">
+                {{ form.hidden_tag() }}
+                
+                <div class="form-group">
+                    <label class="form-label" for="username">{{ form.username.label }}</label>
+                    {{ form.username(class="form-input", id="username", placeholder="Enter your username") }}
+                    {% for error in form.username.errors %}
+                        <p class="error-message">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">{{ form.password.label }}</label>
+                    {{ form.password(class="form-input", id="password", placeholder="Enter your password") }}
+                    {% for error in form.password.errors %}
+                        <p class="error-message">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="auth-btn auth-btn-primary">
+                    Login
+                    <span class="btn-arrow">→</span>
+                </button>
+            </form>
+
+            <div class="auth-divider">
+                <span>or</span>
             </div>
-            <div class="mb-3">
-                <button type="submit" class="btn btn-primary btn-block">Login</button>
-            </div>
-        </form>
-        <p class="or-divider">or</p>
-        <div class="mb-3">
-            <p class="register-link"><a href="{{ url_for('register', role=request.args.get('role')) }}" class="btn btn-register">Register</a>
+
+            <a href="{{ url_for('register', role=request.args.get('role')) }}" class="auth-btn auth-btn-secondary">
+                Create Account
+            </a>
+
+            <a href="{{ url_for('welcome') }}" class="back-link">← Back to Home</a>
         </div>
     </div>
 
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-    <script src="static/validation.js"></script>
+    <script src="{{ url_for('static', filename='scripts/auth.js') }}"></script>
 </body>
 </html>

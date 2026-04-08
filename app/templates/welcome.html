@@ -3,49 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Earn Money by Driving or Get a Ride Now</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <title>ViteGo | Fast Rides, Quality Service</title>
+ 
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+ 
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/welcome.css') }}">
 </head>
 <body>
-    <div class="black-block">
-        <img src="{{ url_for('static', filename='uber_logo.png') }}" alt="Your Logo" class="logo">
-        <div class="buttons">
-            <button class="btn btn-outline-light rounded-pill login-button" onclick="showFullWidthBox('login')">Login</button>
-            <button class="btn btn-outline-light rounded-pill signup-button" onclick="showFullWidthBox('register')">Sign Up</button>
-        </div>
+    <!-- Animated Background Shapes -->
+    <div class="bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+        <div class="shape shape-5"></div>
+        <div class="shape shape-6"></div>
+        <div class="shape shape-7"></div>
+        <div class="shape shape-8"></div>
+    </div>
+    <div class="gradient-mesh"></div>
+ 
+    <!-- Parallax Background Layers -->
+    <div class="parallax-bg" id="parallaxBg">
+        <div class="parallax-layer layer-1" data-speed="0.2"></div>
+        <div class="parallax-layer layer-2" data-speed="0.5"></div>
+        <div class="parallax-layer layer-3" data-speed="0.8"></div>
     </div>
 
-    <p class="custom-text-style">
-        Log in to access <br> your account
-    </p>
-
-    <img src="{{ url_for('static', filename='uber_hp_logo.png') }}" alt="Your Image" class="custom-image-style">
-
-    <div class="full-width-box full-width-box-with-image">
-        <img src="{{ url_for('static', filename='box_bg.png') }}" alt="Background Image" class="background-img">
-
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="function-buttons">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <button class="btn btn-user btn-lg btn-block rounded-pill" onclick="redirectPage('login', 'user')">User</button>
-                            </div>
-                            <div class="col-md-6">
-                                <button class="btn btn-driver btn-lg btn-block rounded-pill" onclick="redirectPage('login', 'driver')">Driver</button>
+    <!-- Road Canvas Scene -->
+    <canvas id="roadCanvas"></canvas>
+ 
+    <!-- Navigation -->
+    <nav class="nav-bar" id="navBar">
+        <div class="nav-wrapper">
+            <div class="logo">Vite<span>Go</span></div>
+            <div class="nav-links">
+                <button class="nav-btn" onclick="showAuthModal('login')">Login</button>
+                <button class="nav-btn nav-btn-primary" onclick="showAuthModal('register')">Get Started</button>
+            </div>
+        </div>
+    </nav>
+ 
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span>Lightning Fast</span>
+                </div>
+                <h1 class="hero-title">
+                    Speed Meets <span class="gradient-text">Excellence</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Get where you need to be in minutes, not hours. Premium rides, professional drivers, and unmatched quality—delivered at the speed you deserve.
+                </p>
+                <div class="hero-buttons">
+                    <a href="{{ url_for('login', role='user') }}" class="btn btn-primary">
+                        Ride Now
+                    </a>
+                    <a href="{{ url_for('login', role='driver') }}" class="btn btn-secondary">
+                        Drive With Us
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="phone-mockup">
+                    <div class="phone-frame">
+                        <div class="phone-screen">
+                            <div class="phone-content">
+                                <div class="phone-header">
+                                    <div class="avatar"></div>
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 0.9rem;">Fast pickup! ⚡</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-secondary);">Quality assured</div>
+                                    </div>
+                                </div>
+                                <div class="phone-ride-card">
+                                    <div class="car-icon">🚗</div>
+                                    <div>
+                                        <div style="font-weight: 600;">Driver arriving!</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary);">2 min away</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <button class="btn btn-outline-dark rounded-pill uber-font exit-button" onclick="hideFullWidthBox()">X</button>
+                    <div class="floating-card floating-card-1">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <span style="font-size: 1.5rem;">⚡</span>
+                            <div>
+                                <div style="font-weight: 600; font-size: 0.9rem;">Ultra Fast</div>
+                                <div style="font-size: 0.75rem; color: var(--text-secondary);">Avg. 2 min pickup</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="floating-card floating-card-2">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <span style="font-size: 1.5rem;">⭐</span>
+                            <div>
+                                <div style="font-weight: 600; font-size: 0.9rem;">Top Quality</div>
+                                <div style="font-size: 0.75rem; color: var(--text-secondary);">4.9★ Rated Service</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+ 
+    <!-- Features Section -->
+    <section class="features">
+        <div class="section-header">
+            <span class="section-tag">Why ViteGo</span>
+            <h2 class="section-title">Fast & Flawless</h2>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card reveal">
+                <div class="feature-icon purple">⚡</div>
+                <h3 class="feature-title">Lightning Speed</h3>
+                <p class="feature-text">Average pickup in under 2 minutes. Our smart dispatch system gets you moving faster than anyone else.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon pink">⭐</div>
+                <h3 class="feature-title">Premium Quality</h3>
+                <p class="feature-text">Vetted professional drivers, immaculate vehicles, and a service standard that never compromises.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon cyan">�</div>
+                <h3 class="feature-title">Real-Time Tracking</h3>
+                <p class="feature-text">Watch your ride approach live. Precise ETAs so you're never left waiting or wondering.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon orange">🛡️</div>
+                <h3 class="feature-title">Always Reliable</h3>
+                <p class="feature-text">24/7 availability, transparent pricing, and a commitment to getting you there on time, every time.</p>
+            </div>
+        </div>
+    </section>
+ 
+    <!-- Roles Section -->
+    <section class="roles">
+        <div class="section-header">
+            <span class="section-tag">Join the Movement</span>
+            <h2 class="section-title">Speed. Quality. Success</h2>
+        </div>
+        <div class="roles-grid">
+            <div class="role-card" onclick="redirectPage('register', 'user')">
+                <div class="role-content">
+                    <div class="role-icon">⚡</div>
+                    <h3 class="role-title">Ride with Speed</h3>
+                    <p class="role-desc">Experience the fastest pickups in the city. Quality vehicles, professional drivers, and service that respects your time.</p>
+                    <button class="role-btn">
+                        Get Started →
+                    </button>
+                </div>
+            </div>
+            <div class="role-card" onclick="redirectPage('register', 'driver')">
+                <div class="role-content">
+                    <div class="role-icon">�</div>
+                    <h3 class="role-title">Drive & Earn</h3>
+                    <p class="role-desc">Join a network that values speed and quality. Better earnings, smarter routes, and drivers who take pride in their work.</p>
+                    <button class="role-btn">
+                        Start Driving →
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+ 
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">ViteGo</div>
+            <p class="footer-tagline">Fast rides. Quality service. Every single time.</p>
+            <div class="footer-features">
+                <span class="footer-feature">2-Min Pickup</span>
+                <span class="footer-feature">Top-Rated Drivers</span>
+                <span class="footer-feature">24/7 Availability</span>
+                <span class="footer-feature">Premium Quality</span>
+            </div>
+        </div>
+    </footer>
+ 
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="modalTitle">Join ViteGo</h2>
+            <div class="role-options">
+                <div class="role-option" onclick="redirectPage(currentAuthAction, 'user')">
+                    <div class="role-option-icon">⚡</div>
+                    <div class="role-option-text">
+                        <div class="role-option-title">I'm a Rider</div>
+                        <div class="role-option-desc">Fast, quality rides at your fingertips</div>
+                    </div>
+                    <div class="role-option-arrow">→</div>
+                </div>
+                <div class="role-option" onclick="redirectPage(currentAuthAction, 'driver')">
+                    <div class="role-option-icon">🚗</div>
+                    <div class="role-option-text">
+                        <div class="role-option-title">I'm a Driver</div>
+                        <div class="role-option-desc">Earn more with quality service</div>
+                    </div>
+                    <div class="role-option-arrow">→</div>
                 </div>
             </div>
         </div>
     </div>
-
-    <script src="https://unpkg.com/uber-fonts/releases/v0.0.2/uber-fonts.css"></script>
+ 
     <script src="{{ url_for('static', filename='scripts/welcome.js') }}"></script>
 </body>
 </html>

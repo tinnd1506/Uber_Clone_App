@@ -1,0 +1,406 @@
+/* ============================================
+   MODERN SHARED STYLES - ViteGo
+   Shared across all app pages for consistent design
+   ============================================ */
+
+:root {
+    --font-display: 'Poppins', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --gradient-primary: linear-gradient(135deg, #de2e03 0%, #ff5722 100%);
+    --text-primary: #1c1917;
+    --text-secondary: #57534e;
+    --text-muted: #78716c;
+    --bg-primary: #fef7f3;
+    --bg-secondary: #fff9f5;
+    --premium: cubic-bezier(0.4, 0, 0.2, 1);
+    --accent-gold: #f59e0b;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    background: linear-gradient(135deg, #fef7f3 0%, #fff9f5 50%, #fef3ed 100%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ============================================
+   MODERN NAVIGATION BAR
+   ============================================ */
+
+.modern-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 1.5rem 3rem;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s var(--premium);
+}
+
+.modern-nav.scrolled {
+    padding: 1rem 3rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-logo {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-decoration: none;
+    transition: transform 0.3s var(--premium);
+}
+
+.nav-logo:hover {
+    transform: scale(1.05);
+}
+
+.nav-logo span {
+    font-weight: 400;
+}
+
+.nav-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.nav-user {
+    color: var(--text-primary);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.nav-btn {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 0.75rem 1.75rem;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.4s var(--premium);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.nav-btn-primary {
+    background: var(--gradient-primary);
+    color: #ffffff;
+    box-shadow: 0 4px 20px rgba(222, 46, 3, 0.25);
+}
+
+.nav-btn-primary:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 30px rgba(222, 46, 3, 0.35);
+}
+
+.nav-btn-secondary {
+    background: transparent;
+    color: var(--text-primary);
+    border: 2px solid rgba(222, 46, 3, 0.3);
+}
+
+.nav-btn-secondary:hover {
+    background: rgba(222, 46, 3, 0.05);
+    border-color: rgba(222, 46, 3, 0.5);
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   MODERN CONTAINER
+   ============================================ */
+
+.modern-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 6rem 2rem 2rem;
+}
+
+/* ============================================
+   MODERN CARD
+   ============================================ */
+
+.modern-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(30px);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.08),
+        0 4px 20px rgba(222, 46, 3, 0.05);
+    transition: all 0.5s var(--premium);
+}
+
+.modern-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 
+        0 30px 80px rgba(0, 0, 0, 0.12),
+        0 8px 30px rgba(222, 46, 3, 0.15);
+}
+
+.card-header {
+    margin-bottom: 1.5rem;
+}
+
+.card-title {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #1c1917 0%, #3d3228 30%, #5c4d42 60%, #8b5a44 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.card-subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+/* ============================================
+   MODERN FORM ELEMENTS
+   ============================================ */
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.02em;
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
+    font-family: var(--font-body);
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    transition: all 0.3s var(--premium);
+    outline: none;
+}
+
+.form-input:focus,
+.form-select:focus {
+    border-color: #de2e03;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 
+        0 0 0 4px rgba(222, 46, 3, 0.1),
+        0 8px 20px rgba(222, 46, 3, 0.15);
+    transform: translateY(-2px);
+}
+
+.form-input::placeholder {
+    color: rgba(87, 83, 78, 0.5);
+}
+
+/* ============================================
+   MODERN BUTTONS
+   ============================================ */
+
+.btn-modern {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 1rem 2rem;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.4s var(--premium);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-modern-primary {
+    background: var(--gradient-primary);
+    color: #ffffff;
+    box-shadow: 0 4px 20px rgba(222, 46, 3, 0.25);
+}
+
+.btn-modern-primary:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 30px rgba(222, 46, 3, 0.35);
+}
+
+.btn-modern-secondary {
+    background: transparent;
+    color: var(--text-primary);
+    border: 2px solid rgba(222, 46, 3, 0.3);
+}
+
+.btn-modern-secondary:hover {
+    background: rgba(222, 46, 3, 0.05);
+    border-color: rgba(222, 46, 3, 0.5);
+    transform: translateY(-2px);
+}
+
+.btn-modern-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.25);
+}
+
+.btn-modern-success:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.35);
+}
+
+/* ============================================
+   MODERN TABLE
+   ============================================ */
+
+.modern-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.5rem;
+}
+
+.modern-table thead th {
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem;
+    text-align: left;
+    border: none;
+}
+
+.modern-table tbody tr {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s var(--premium);
+}
+
+.modern-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateX(5px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.modern-table tbody td {
+    padding: 1.25rem 1rem;
+    border: none;
+    color: var(--text-primary);
+}
+
+.modern-table tbody tr td:first-child {
+    border-radius: 12px 0 0 12px;
+}
+
+.modern-table tbody tr td:last-child {
+    border-radius: 0 12px 12px 0;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+.fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-in-left {
+    animation: slideInLeft 0.6s ease-out forwards;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.slide-in-right {
+    animation: slideInRight 0.6s ease-out forwards;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .modern-nav {
+        padding: 1rem 1.5rem;
+    }
+
+    .modern-container {
+        padding: 5rem 1rem 1rem;
+    }
+
+    .modern-card {
+        padding: 1.5rem;
+    }
+
+    .nav-actions {
+        gap: 0.5rem;
+    }
+
+    .nav-btn {
+        padding: 0.625rem 1.25rem;
+        font-size: 0.875rem;
+    }
+}

@@ -3,120 +3,414 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/chat.css') }}">
-</head>
-<style>
+    <title>Ride Chat | ViteGo</title>
     
-
-</style>
-    <body>
-    <div class="black-block">
-        <img src="{{ url_for('static', filename='uber_logo.png') }}" alt="Your Logo" class="logo">
-       
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/modern_shared.css') }}">
+    
+    <style>
+        .chat-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            max-width: 900px;
+            margin: 1rem auto 0;
+            gap: 0.75rem;
+        }
+        
+        .chat-header-card {
+            background: linear-gradient(135deg, rgba(222, 46, 3, 0.1), rgba(255, 87, 34, 0.05));
+            border: 2px solid rgba(222, 46, 3, 0.2);
+        }
+        
+        .chat-container {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            height: 350px;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .message {
+            display: flex;
+            gap: 1rem;
+            animation: messageSlide 0.3s ease-out;
+        }
+        
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message.own {
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #de2e03, #ff5722);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        
+        .message.own .message-avatar {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        
+        .message-content {
+            max-width: 70%;
+        }
+        
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .message-sender {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1c1917;
+        }
+        
+        .message-role {
+            padding: 0.25rem 0.5rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(222, 46, 3, 0.1);
+            color: #de2e03;
+        }
+        
+        .message-bubble {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem 1.25rem;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .message.own .message-bubble {
+            background: linear-gradient(135deg, rgba(222, 46, 3, 0.1), rgba(255, 87, 34, 0.05));
+            border-color: rgba(222, 46, 3, 0.2);
+        }
+        
+        .message-text {
+            color: #1c1917;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+        }
+        
+        .message-time {
+            font-size: 0.75rem;
+            color: #78716c;
+        }
+        
+        .chat-input-area {
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .chat-input-wrapper {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 0.75rem 1.25rem;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            color: #1c1917;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 100px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        .chat-input:focus {
+            border-color: #de2e03;
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 0 4px rgba(222, 46, 3, 0.1);
+        }
+        
+        .send-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #de2e03, #ff5722);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(222, 46, 3, 0.25);
+        }
+        
+        .send-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 30px rgba(222, 46, 3, 0.35);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Modern Navigation -->
+    <nav class="modern-nav">
+        <div class="nav-container">
+            <a href="{{ url_for('welcome') }}" class="nav-logo" onclick="localStorage.clear(); sessionStorage.clear();">Vite<span>Go</span></a>
+            <div class="nav-actions">
+                <span class="nav-user">💬 {{ user.username }}</span>
+                {% if user.role == 'user' %}
+                <a href="{{ url_for('home', role='user') }}" class="nav-btn nav-btn-secondary">Book Another Ride</a>
+                {% else %}
+                <a href="{{ url_for('home', role='driver') }}" class="nav-btn nav-btn-secondary">Dashboard</a>
+                {% endif %}
+            </div>
         </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="modern-container">
+        {% if not has_ride %}
+        <div class="modern-card fade-in" style="text-align: center; padding: 4rem 2rem; margin-top: 1rem;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🚗</div>
+            {% if user.role == 'user' %}
+            <h2 style="font-family: 'Poppins', sans-serif; color: #1c1917; margin-bottom: 1rem;">No available rides</h2>
+            <p style="color: #57534e; margin-bottom: 2rem;">You haven't requested any rides yet. Book a ride to get started!</p>
+            <a href="{{ url_for('home') }}" class="btn-modern btn-modern-primary" style="display: inline-block; text-decoration: none; padding: 0.75rem 2rem;">
+                Book a Ride
+                <span style="margin-left: 0.5rem;">→</span>
+            </a>
+            {% else %}
+            <h2 style="font-family: 'Poppins', sans-serif; color: #1c1917; margin-bottom: 1rem;">No active rides</h2>
+            <p style="color: #57534e; margin-bottom: 2rem;">You don't have any active rides right now. Return to your dashboard to accept a new request.</p>
+            <a href="{{ url_for('home', role='driver') }}" class="btn-modern btn-modern-primary" style="display: inline-block; text-decoration: none; padding: 0.75rem 2rem;">
+                Go to Dashboard
+                <span style="margin-left: 0.5rem;">→</span>
+            </a>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="chat-layout">
+            <!-- Chat Header -->
+            <div class="modern-card chat-header-card fade-in">
+                <div class="card-header">
+                    <h1 class="card-title">💬 Ride Chat</h1>
+                    <p class="card-subtitle">
+                        {% if user.role == 'user' %}
+                        Chat with your driver
+                        {% else %}
+                        Chat with your passenger
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Chat Container -->
+            <div class="chat-container fade-in" style="animation-delay: 0.1s;">
+                <div class="chat-messages" id="chat-history">
+                    <!-- Messages will be inserted here -->
+                </div>
+                
+                <div class="chat-input-area">
+                    <div class="chat-input-wrapper">
+                        <input type="text" 
+                               id="message-input" 
+                               class="chat-input" 
+                               placeholder="Type your message..."
+                               onkeypress="if(event.key === 'Enter') sendMessage()">
+                        <button class="send-btn" onclick="sendMessage()">➤</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons fade-in" style="animation-delay: 0.2s;">
+                {% if user.role == 'user' %}
+                <button class="btn-modern btn-modern-success" onclick="redirectToPayment()" style="flex: 1;">
+                    💳 Proceed to Payment
+                </button>
+                {% endif %}
+                {% if user.role == 'driver' %}
+                <a href="{{ url_for('earnings', ride_id=confirmed_ride_id) }}" class="btn-modern btn-modern-success" style="flex: 1; text-decoration: none;">
+                    ✓ Confirm Arrival & Complete Ride
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
     </div>
 
-    <div id="chat-container">
-        <div id="chat-history">
-
-
-        <div>
-            <input type="text" id="message-input" placeholder="Type your message...">
-            <button id="send-button" onclick="sendMessage()">Send</button>
-        </div>
-    </div>
+    <!-- Modern Shared JS -->
+    <script src="{{ url_for('static', filename='scripts/modern_shared.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
-    {% if user.role == 'user' %}
-    <div>
-        <button class="action-button" onclick="redirectToPayment()">Pay for Ride</button>
-    </div>
-    {% endif %}
-    {% if user.role == 'driver' %}
-    <div>
-        <a class="confirmation-button" href="{{ url_for('earnings', ride_id=ride_id) }}">Confirm Arrival</a>
-    </div>
-    {% endif %}
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
     <script>
 
 
-var socket = io.connect('http://' + document.domain + ':' + location.port);
+var socket = io();
+var currentUser = '{{ user.username }}';
 
 function displayMessage(messageData) {
-            var chatHistory = document.getElementById('chat-history');
-            var messageElement = document.createElement('p');
-            var senderInfo = `${messageData.sender} (${messageData.role})`;
-            
-            messageElement.textContent = `${senderInfo}: ${messageData.message} (${messageData.timestamp})`;
-            chatHistory.appendChild(messageElement);
-        }
+    var chatHistory = document.getElementById('chat-history');
+    var isOwnMessage = messageData.sender === currentUser;
+    
+    var messageDiv = document.createElement('div');
+    messageDiv.className = 'message' + (isOwnMessage ? ' own' : '');
+    
+    var avatar = document.createElement('div');
+    avatar.className = 'message-avatar';
+    avatar.textContent = messageData.sender.charAt(0).toUpperCase();
+    
+    var contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    
+    var headerDiv = document.createElement('div');
+    headerDiv.className = 'message-header';
+    
+    var senderSpan = document.createElement('span');
+    senderSpan.className = 'message-sender';
+    senderSpan.textContent = messageData.sender;
+    
+    var roleSpan = document.createElement('span');
+    roleSpan.className = 'message-role';
+    roleSpan.textContent = messageData.role;
+    
+    headerDiv.appendChild(senderSpan);
+    headerDiv.appendChild(roleSpan);
+    
+    var bubbleDiv = document.createElement('div');
+    bubbleDiv.className = 'message-bubble';
+    
+    var textDiv = document.createElement('div');
+    textDiv.className = 'message-text';
+    textDiv.textContent = messageData.message;
+    
+    var timeDiv = document.createElement('div');
+    timeDiv.className = 'message-time';
+    timeDiv.textContent = messageData.timestamp;
+    
+    bubbleDiv.appendChild(textDiv);
+    bubbleDiv.appendChild(timeDiv);
+    
+    contentDiv.appendChild(headerDiv);
+    contentDiv.appendChild(bubbleDiv);
+    
+    messageDiv.appendChild(avatar);
+    messageDiv.appendChild(contentDiv);
+    
+    chatHistory.appendChild(messageDiv);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+}
 
-
-        function isDuplicateMessage(messageData) {
-            var chatHistory = document.getElementById('chat-history');
-            var messages = chatHistory.getElementsByTagName('p');
-
-            for (var i = 0; i < messages.length; i++) {
-                if (messages[i].textContent === `${messageData.sender}: ${messageData.message} (${messageData.timestamp})`) {
-                    return true; 
-                }
-            }
-
-            var messageInput = document.getElementById('message-input');
-            var currentMessage = `${messageData.sender}: ${messageInput.value.trim()} (${messageData.timestamp})`;
-
-            if (currentMessage === `${messageData.sender}: ${messageData.message} (${messageData.timestamp})`) {
-                return true; 
-            }
-
-            return false; 
-        }
-
-        function sendMessage() {
-            var messageInput = document.getElementById('message-input');
-            var message = messageInput.value.trim();
-
-            if (message !== '') {
-                var messageData = {
-                    sender: '{{ user.username }}',
-                    role: '{{ user.role }}',  
-                    receiver: 'driver', 
-                    message: message,
-                    timestamp: new Date().toLocaleString(),
-                    ride_id: '{{ ride_id }}'
-                };
-
-                socket.emit('send_message', messageData);
-
-                if (!isDuplicateMessage(messageData)) {
-                    displayMessage(messageData);
-                }
-
-                messageInput.value = '';
-            }
-        }
-
-        socket.on('receive_message', function (messageData) {
-            if (!isDuplicateMessage(messageData)) {
-                displayMessage(messageData);
-            }
-        });
-
-        function redirectToPayment() {
-            var urlParams = new URLSearchParams(window.location.search);
-            var tripCost = urlParams.get('trip_cost');
-
-            if (tripCost !== null) {
-                window.location.href = '/payment?trip_cost=' + tripCost;
-            } else {
-                alert('Trip cost not available. Cannot proceed to payment.');
+function isDuplicateMessage(messageData) {
+    var chatHistory = document.getElementById('chat-history');
+    var messages = chatHistory.querySelectorAll('.message');
+    
+    for (var i = 0; i < messages.length; i++) {
+        var messageText = messages[i].querySelector('.message-text');
+        var messageTime = messages[i].querySelector('.message-time');
+        
+        if (messageText && messageTime) {
+            if (messageText.textContent === messageData.message && 
+                messageTime.textContent === messageData.timestamp) {
+                return true;
             }
         }
+    }
+    return false;
+}
 
+function sendMessage() {
+    var messageInput = document.getElementById('message-input');
+    var message = messageInput.value.trim();
+
+    if (message !== '') {
+        var messageData = {
+            sender: '{{ user.username }}',
+            role: '{{ user.role }}',  
+            receiver: 'driver', 
+            message: message,
+            timestamp: new Date().toLocaleString(),
+            ride_id: '{{ ride_id }}'
+        };
+
+        socket.emit('send_message', messageData);
+
+        if (!isDuplicateMessage(messageData)) {
+            displayMessage(messageData);
+        }
+
+        messageInput.value = '';
+    }
+}
+
+socket.on('receive_message', function (messageData) {
+    if (!isDuplicateMessage(messageData)) {
+        displayMessage(messageData);
+    }
+});
+
+function redirectToPayment() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var tripCost = urlParams.get('trip_cost');
+
+    if (!tripCost) {
+        tripCost = "{{ trip_cost if trip_cost is not none else '' }}";
+    }
+
+    if (tripCost && tripCost !== '') {
+        window.location.href = '/payment?trip_cost=' + tripCost;
+    } else {
+        alert('Trip cost not available. Cannot proceed to payment.');
+    }
+}
     </script>
-
 </body>
 </html>
