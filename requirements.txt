@@ -8,3 +8,4 @@ Flask-DebugToolbar==0.15.1
 python-dotenv==0.19.2
 pymongo[srv]==3.12.1
 requests==2.26.0
+email_validator==2.1.0
