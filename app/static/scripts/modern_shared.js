@@ -160,3 +160,61 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// Toast Notification System
+function showToast(title, message, type = 'info', duration = 5000) {
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `modern-toast`;
+    
+    const icons = {
+        success: '✓',
+        error: '✕',
+        info: 'ℹ'
+    };
+
+    toast.innerHTML = `
+        <div class="toast-icon toast-icon-${type}">${icons[type] || icons.info}</div>
+        <div class="toast-content">
+            <div class="toast-title">${title}</div>
+            <div class="toast-message">${message}</div>
+        </div>
+        <button class="toast-close">✕</button>
+        <div class="toast-progress"></div>
+    `;
+
+    container.appendChild(toast);
+
+    // Trigger animation
+    requestAnimationFrame(() => {
+        toast.classList.add('show');
+    });
+
+    // Progress bar animation
+    const progress = toast.querySelector('.toast-progress');
+    progress.style.animation = `toastProgress ${duration}ms linear forwards`;
+
+    // Close on click
+    const closeBtn = toast.querySelector('.toast-close');
+    closeBtn.onclick = () => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 600);
+    };
+
+    // Auto remove
+    const timeout = setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 600);
+    }, duration);
+
+    toast.onmouseenter = () => clearTimeout(timeout);
+}
+
+// Export for global use
+window.showToast = showToast;

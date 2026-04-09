@@ -57,14 +57,16 @@ function confirmRide(rideId) {
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
-            alert('Ride confirmed successfully!');
-            window.location.href = '/chat'; 
+            showToast("Success", "Ride confirmed successfully!", "success");
+            setTimeout(() => {
+                window.location.href = '/chat'; 
+            }, 1500);
         } else {
-            alert('Failed to confirm ride. Please try again.');
+            showToast("Failed", "Failed to confirm ride. Please try again.", "error");
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred. Please try again.');
+        showToast("Error", "An error occurred. Please try again.", "error");
     });
 }

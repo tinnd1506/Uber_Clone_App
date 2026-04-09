@@ -241,7 +241,7 @@ var destinationAddress = $('#to_places').val();
 
 getCoordinatesFromAddress(originAddress, function (originCoordinates) {
     if (!originCoordinates) {
-        alert('Error getting coordinates for the origin address. Please try again.');
+        showToast("Location Error", "Error getting coordinates for the origin address. Please try again.", "error");
         return;
     }
 
@@ -270,14 +270,14 @@ getCoordinatesFromAddress(originAddress, function (originCoordinates) {
         data: JSON.stringify(rideData),
         success: function (response) {
             if (response.status === 'success') {
-                alert('Ride requested successfully!');
+                showToast("Success", "Ride requested successfully!", "success");
                 window.location.href = '/chat?trip_cost=' + tripCost;
             } else {
-                alert('Failed to request ride. Please try again.');
+                showToast("Request Failed", "Failed to request ride. Please try again.", "error");
             }
         },
         error: function (error) {
-            alert('Error requesting ride. Please try again.');
+            showToast("Error", "Error requesting ride. Please try again.", "error");
             console.error('Error:', error);
         }
     });
@@ -400,7 +400,7 @@ function displayRoute(travel_mode, origin, destination, directionsService, direc
             }
             directionsDisplay.setMap(null);
             directionsDisplay.setDirections(null);
-            alert('Directions request failed due to ' + status);
+            showToast("Route Error", "Directions request failed due to " + status, "error");
         }
     });
 }
@@ -440,7 +440,7 @@ function save_results(response, status) {
                 }
 
                 if (isReverse && pickupTime.isBefore(moment().add(30, 'minutes'))) {
-                    alert('Please choose a pickup time at least 30 minutes from the current time.');
+                    showToast("Invalid Time", "Please choose a pickup time at least 30 minutes from the current time.", "info");
                     return;
                 }
             } else {
@@ -497,7 +497,7 @@ $('#distance_form').submit(function (e) {
                 }
 
         if (isReverse && pickupTime.isBefore(moment().add(30, 'minutes'))) {
-            alert('Please choose a pickup time at least 30 minutes from the current time.');
+            showToast("Invalid Time", "Please choose a pickup time at least 30 minutes from the current time.", "info");
             return;
         }
     } else {
@@ -566,20 +566,20 @@ function setCurrentPosition(pos) {
                     data: JSON.stringify(rideData),
                     success: function (response) {
                         if (response.status === 'success') {
-                            alert('Ride requested successfully!');
+                            showToast("Success", "Ride requested successfully!", "success");
                         } else {
-                            alert('Failed to request ride. Please try again.');
+                            showToast("Request Failed", "Failed to request ride. Please try again.", "error");
                         }
                     },
                     error: function (error) {
-                        alert('Error requesting ride. Please try again.');
+                        showToast("Error", "Error requesting ride. Please try again.", "error");
                         console.error('Error:', error);
                     }
                 });
             }
         } else {
-            alert('Geocoder failed due to: ' + status);
-        }
+                showToast("Geocoder Failed", "Geocoder failed due to: " + status, "error");
+            }
     });
 }
 });

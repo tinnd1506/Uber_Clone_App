@@ -371,15 +371,17 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    alert('Ride accepted! Redirecting to chat...');
-                    window.location.href = '/chat';
+                    showToast("Accepted", "Ride accepted! Redirecting to chat...", "success");
+                    setTimeout(() => {
+                        window.location.href = '/chat';
+                    }, 1500);
                 } else {
-                    alert('Failed to accept ride: ' + data.message);
+                    showToast("Failed", "Failed to accept ride: " + data.message, "error");
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error accepting ride. Please try again.');
+                showToast("Error", "Error accepting ride. Please try again.", "error");
             });
         }
     </script>

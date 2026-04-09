@@ -408,7 +408,7 @@ function redirectToPayment() {
     if (tripCost && tripCost !== '') {
         window.location.href = '/payment?trip_cost=' + tripCost;
     } else {
-        alert('Trip cost not available. Cannot proceed to payment.');
+        showToast("Payment Error", "Trip cost not available. Cannot proceed to payment.", "error");
     }
 }
     </script>

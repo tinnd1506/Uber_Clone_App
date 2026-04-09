@@ -261,16 +261,29 @@
 
     <script>
         document.getElementById('paymentForm')?.addEventListener('submit', function (e) {
-            // Show loading state
+            // Prevent default to show the toast first, then submit
+            // Actually, if we want to show the toast AND move on, we should handle the redirection properly
+            
             const btn = this.querySelector('button');
             const originalText = btn.innerHTML;
             btn.innerHTML = '⏳ Processing...';
             btn.disabled = true;
 
-            // Allow form to submit
+            // Show toast and then redirect or submit
             setTimeout(() => {
-                alert("✓ Payment confirmed! An invoice has been sent to your email address.");
-            }, 500);
+                showToast(
+                    "Payment Successful", 
+                    "Your invoice has been sent to your email address.", 
+                    "success"
+                );
+                
+                // Wait for the user to see the toast before redirecting
+                setTimeout(() => {
+                    this.submit();
+                }, 1500);
+            }, 800);
+
+            e.preventDefault();
         });
     </script>
 </body>

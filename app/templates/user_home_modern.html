@@ -440,7 +440,7 @@
 
             getCoordinatesFromAddress(originAddress, function (originCoordinates) {
                 if (!originCoordinates) {
-                    alert('Error getting coordinates for the origin address. Please try again.');
+                    showToast("Location Error", "Error getting coordinates for the origin address. Please try again.", "error");
                     return;
                 }
 
@@ -467,14 +467,14 @@
                     data: JSON.stringify(rideData),
                     success: function (response) {
                         if (response.status === 'success') {
-                            alert('Ride requested successfully!');
+                            showToast("Success", "Ride requested successfully!", "success");
                             window.location.href = '/chat?trip_cost=' + tripCost;
                         } else {
-                            alert('Failed to request ride. Please try again.');
+                            showToast("Request Failed", "Failed to request ride. Please try again.", "error");
                         }
                     },
                     error: function (error) {
-                        alert('Error requesting ride. Please try again.');
+                        showToast("Error", "Error requesting ride. Please try again.", "error");
                         console.error('Error:', error);
                     }
                 });
@@ -511,12 +511,34 @@
 
         function getCurrentPosition() {
             if (!navigator.geolocation) {
-                alert('Geolocation is not supported by this browser.');
+                showToast("Not Supported", "Geolocation is not supported by this browser.", "info");
                 return;
             }
             navigator.geolocation.getCurrentPosition(setCurrentPosition, function (error) {
-                alert('Unable to get your current location.');
+                let msg = "Unable to get your current location.";
+                
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        msg = "Location access was denied. Please click the Lock icon 🔒 in your browser's address bar and set 'Location' to 'Allow'.";
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        msg = "Location information is unavailable on this device or network.";
+                        break;
+                    case error.TIMEOUT:
+                        msg = "The request to get your location timed out. Please try again.";
+                        break;
+                    default:
+                        if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+                            msg = "Geolocation requires HTTPS. Use 'localhost' or an HTTPS connection.";
+                        }
+                }
+                
+                showToast("Location Error", msg, "error", 10000);
                 console.error('Geolocation error:', error);
+            }, {
+                enableHighAccuracy: true,
+                timeout: 8000,
+                maximumAge: 0
             });
         }
 
@@ -539,7 +561,7 @@
                         }
                     }
                 } else {
-                    alert('Geocoder failed due to: ' + status);
+                    showToast("Geocoder Failed", "Geocoder failed due to: " + status, "error");
                 }
             });
         }
@@ -766,7 +788,7 @@
                         }
                         directionsDisplay.setMap(null);
                         directionsDisplay.setDirections(null);
-                        alert('Directions request failed due to ' + status);
+                        showToast("Route Error", "Directions request failed due to " + status, "error");
                     }
                 });
             }
@@ -787,7 +809,7 @@
 
             function save_results(response, status) {
                 if (status !== google.maps.DistanceMatrixStatus.OK) {
-                    alert("Error: " + status);
+                    showToast("Matrix Error", "Error: " + status, "error");
                 } else {
                     try {
                         var pickupTimeInput = $('#selected_datetime');

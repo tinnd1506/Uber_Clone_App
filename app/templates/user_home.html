@@ -1515,8 +1515,30 @@
                     // Remove loading state on error
                     locationBtn.removeClass('loading');
                     locationBtn.html(originalText);
-                    alert('Unable to get your current location. Please check your browser permissions.');
+                    
+                    let msg = "Unable to get your current location.";
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            msg = "Location access was denied. Please click the Lock icon 🔒 in your address bar and set 'Location' to 'Allow'.";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            msg = "Location information is unavailable on this device.";
+                            break;
+                        case error.TIMEOUT:
+                            msg = "The request to get your location timed out.";
+                            break;
+                        default:
+                            if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+                                msg = "Geolocation requires HTTPS. Please access via 'localhost' or an HTTPS connection.";
+                            }
+                    }
+                    
+                    showToast("Location Error", msg, "error", 10000);
                     console.error('Geolocation error:', error);
+                }, {
+                    enableHighAccuracy: true,
+                    timeout: 8000,
+                    maximumAge: 0
                 }
             );
         }
@@ -1542,7 +1564,7 @@
                         }
                     }
                 } else {
-                    alert('Geocoder failed due to: ' + status);
+                    showToast("Geocoder Failed", "Geocoder failed due to: " + status, "error");
                 }
             });
         }
@@ -1848,7 +1870,7 @@
                                 pickupTime = moment($('#selected_datetime').val());
                             }
                             if (isReverse && pickupTime.isBefore(moment().add(30, 'minutes'))) {
-                                alert('Please choose a pickup time at least 30 minutes from the current time.');
+                                showToast("Invalid Time", "Please choose a pickup time at least 30 minutes from the current time.", "info");
                                 return;
                             }
                         } else {
