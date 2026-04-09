@@ -339,7 +339,7 @@ function initFormStagger() {
     });
 }
 
-// Form validation
+// Form validation - Simplified to basic animations
 function initFormValidation() {
     const form = document.querySelector('.auth-form');
     if (!form) return;
@@ -354,6 +354,7 @@ function initFormValidation() {
                 submitBtn.style.transform = '';
             }, 200);
         }
+        // Let the form submit normally to the backend
     });
 }
 
@@ -395,6 +396,17 @@ style.textContent = `
             transform: translate(-50%, -50%) scale(10);
             opacity: 0;
         }
+    }
+
+    @keyframes errorShake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        50% { transform: translateX(10px); }
+        75% { transform: translateX(-10px); }
+    }
+
+    .error-shake {
+        animation: errorShake 0.4s ease-in-out;
     }
 `;
 document.head.appendChild(style);

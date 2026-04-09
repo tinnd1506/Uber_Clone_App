@@ -177,6 +177,7 @@
 
                 <div class="payment-actions">
                     <form id="paymentForm" action="/confirm_payment" method="post">
+                        <input type="hidden" name="trip_cost" value="{{ trip_cost }}">
                         <button type="submit" class="btn-modern btn-modern-success" style="width: 100%;">
                             ✓ Confirm Payment & Send Invoice
                         </button>

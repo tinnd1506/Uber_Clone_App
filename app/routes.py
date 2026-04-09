@@ -41,23 +41,35 @@ def register():
 
     if form.validate_on_submit():
         start_time = time.time()
-
         username = form.username.data
         password = form.password.data
         email = form.email.data
         role = request.args.get('role', 'user')  
 
-        with sqlite3.connect("database.db") as con:
+        db_name = os.getenv("SQLITE_DB_NAME") or "database.db"
+        with sqlite3.connect(db_name) as con:
             cur = con.cursor()
+            cur.execute("SELECT id FROM users WHERE username = ? OR email = ?", (username, email))
+            existing_user = cur.fetchone()
+            
+            if existing_user:
+                flash("Username or Email already exists. Please use a different one.", "danger")
+                return render_template('register.html', form=form)
+
             try:
                 cur.execute("INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)", (username, password, email, role))
                 con.commit()
                 flash("User created successfully. Please login.", "success")
-                end_time = time.time()
-                response_time = end_time - start_time
-                return render_template('register.html', form=form, response_time=response_time)
+                return redirect(url_for('login', role=role))
             except sqlite3.Error as e:
                 flash(f"Error in user creation: {str(e)}", "danger")
+                return render_template('register.html', form=form)
+    
+    # Flash errors if form invalid
+    if request.method == 'POST' and not form.validate_on_submit():
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{form[field].label.text}: {error}", "danger")
 
     return render_template('register.html', form=form)
 
@@ -73,7 +85,8 @@ def login():
         password = form.password.data
         role = request.args.get('role', 'user')  
 
-        with sqlite3.connect("database.db") as con:
+        db_name = os.getenv("SQLITE_DB_NAME") or "database.db"
+        with sqlite3.connect(db_name) as con:
             con.row_factory = sqlite3.Row
             cur = con.cursor()
             cur.execute("SELECT * FROM users WHERE username=? AND role=?", (username, role))
@@ -101,6 +114,11 @@ def login():
             print("User not found")
         flash("Incorrect username or password. Please try again.", "danger")
 
+    if request.method == 'POST' and not form.validate_on_submit():
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{form[field].label.text}: {error}", "danger")
+
     return render_template('login.html', form=form)
 
 
@@ -124,7 +142,7 @@ def home():
         end_time = time.time()
         response_time = end_time - start_time
 
-        return render_template('user_home.html', response_time=response_time)
+        return render_template('user_home.html', response_time=response_time, google_maps_api_key=os.getenv("GOOGLE_MAPS_API_KEY"))
     elif role == 'driver':
         ride_requests = list(db['rides'].find({"status": "requested"}))
         
@@ -143,7 +161,7 @@ def home():
         end_time = time.time()
         response_time = end_time - start_time
 
-        return render_template('driver_home.html', user=current_user, ride_requests=ride_requests, response_time=response_time, today_earn=today_earn)
+        return render_template('driver_home.html', user=current_user, ride_requests=ride_requests, response_time=response_time, today_earn=today_earn, google_maps_api_key=os.getenv("GOOGLE_MAPS_API_KEY"))
     else:
         end_time = time.time()
         response_time = end_time - start_time
@@ -338,40 +356,51 @@ def get_user_email(user_id):
     return user_data['email'] if user_data else None
 
 def send_payment_confirmation_email(to_email, payment_info):
-    subject = 'Invoice'
-    body = f'Thank you for your payment. Ride Cost:\n\n{payment_info}'
+    try:
+        subject = 'ViteGo Receipt - Payment Confirmation'
+        body = f'Thank you for your payment. Here is your receipt information:\n\nRide Cost: ${payment_info}\n\nThank you for riding with ViteGo!'
 
-    msg = Message(subject, sender='your-email@gmail.com', recipients=[to_email])
-    msg.body = body
+        msg = Message(subject, sender=app.config.get('MAIL_USERNAME'), recipients=[to_email])
+        msg.body = body
 
-    mail.send(msg)
+        mail.send(msg)
+        print(f"Email sent successfully to {to_email}")
+        return True
+    except Exception as e:
+        print(f"Error sending email: {str(e)}")
+        return False
 
 @app.route('/confirm_payment', methods=['POST'])
 @login_required
 def confirm_payment():
     try:
-        user_email = get_user_email(current_user.id)
+        # Get email from current_user or DB
+        user_email = current_user.email or get_user_email(current_user.id)
+        
+        # Get trip cost from form or session fallback
+        trip_cost = request.form.get('trip_cost') or session.get('trip_cost', 'N/A')
 
-        if user_email:
-            trip_cost = session.get('trip_cost', 'N/A')
-
-            if trip_cost != 'N/A':
-                # Mark ride as completed in DB so it ends
-                db['rides'].update_one(
-                    {'username': current_user.username, 'status': {'$in': ['requested', 'confirmed']}},
-                    {'$set': {'status': 'completed'}}
-                )
-                
-                send_payment_confirmation_email(user_email, trip_cost)
-
-                flash("Payment confirmed. An email has been sent to your email address.", "success")
-                return redirect(url_for('home'))  
+        if user_email and trip_cost != 'N/A':
+            # Mark ride as completed in DB
+            db['rides'].update_one(
+                {'username': current_user.username, 'status': {'$in': ['requested', 'confirmed']}},
+                {'$set': {'status': 'completed'}}
+            )
+            
+            # Send the email
+            email_sent = send_payment_confirmation_email(user_email, trip_cost)
+            
+            if email_sent:
+                flash("Payment confirmed! An invoice has been sent to your email.", "success")
             else:
-                flash("Failed to retrieve trip cost. Please contact support.", "danger")
+                flash("Payment confirmed, but we had trouble sending the email invoice.", "warning")
+                
+            return redirect(url_for('payment'))
         else:
-            flash("Failed to send email. Please contact support.", "danger")
+            flash("Unable to process payment: Missing email or trip cost details.", "danger")
     except Exception as e:
-        flash(f"Error confirming payment: {str(e)}", "danger")
+        print(f"Payment Confirmation Exception: {str(e)}")
+        flash(f"An error occurred during payment: {str(e)}", "danger")
 
     return redirect(url_for('payment')) 
 
@@ -415,14 +444,3 @@ def earnings():
                            past_rides=driver_rides,
                            total_earnings=total_earnings,
                            now=datetime.now())
-
-def send_payment_confirmation_email(to_email, payment_info):
-    subject = 'Payment Confirmation'
-    body = f'Thank you for your payment. Here is your payment information:\n\n{payment_info}'
-
-    msg = Message(subject, sender='your-email@example.com', recipients=[to_email])
-    msg.body = body
-
-    mail.send(msg)
-
-

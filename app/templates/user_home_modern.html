@@ -1,25 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book a Ride | ViteGo</title>
-    
+
     <!-- Modern Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+
     <!-- Styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/modern_shared.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css">
-    
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css">
+
     <!-- Scripts -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyABdGoPrYmiq5r3fur6Q3kVFGUXrKTNg3s&libraries=places&language=en&callback=initUberMap"></script>
+    <script src="{{ url_for('static', filename='scripts/modern_shared.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
-    
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+
     <style>
         .page-grid {
             display: grid;
@@ -27,12 +32,12 @@
             gap: 2rem;
             align-items: start;
         }
-        
+
         .booking-panel {
             position: sticky;
             top: 120px;
         }
-        
+
         .map-container {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(30px);
@@ -41,12 +46,12 @@
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
         }
-        
+
         #map {
             width: 100%;
             height: 600px;
         }
-        
+
         .location-btn {
             display: inline-flex;
             align-items: center;
@@ -62,13 +67,13 @@
             transition: all 0.3s ease;
             margin-top: 0.5rem;
         }
-        
+
         .location-btn:hover {
             background: rgba(222, 46, 3, 0.15);
             border-color: rgba(222, 46, 3, 0.4);
             transform: translateY(-2px);
         }
-        
+
         .datetime-toggle {
             display: inline-flex;
             align-items: center;
@@ -82,26 +87,26 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .datetime-toggle:hover {
             border-color: #de2e03;
             background: rgba(255, 255, 255, 1);
         }
-        
+
         #datetimepicker {
             margin-top: 1rem;
             padding: 1rem;
             background: rgba(255, 255, 255, 0.5);
             border-radius: 12px;
         }
-        
+
         .car-list {
             margin-top: 1.5rem;
             display: flex;
             flex-direction: column;
             gap: 1rem;
         }
-        
+
         .car-item {
             display: flex;
             gap: 1.5rem;
@@ -126,7 +131,7 @@
             transition: opacity 0.2s ease;
             pointer-events: none;
         }
-        
+
         .car-item:hover {
             background: rgba(255, 255, 255, 0.9);
             border-color: #de2e03;
@@ -137,7 +142,7 @@
         .car-item:hover::before {
             opacity: 1;
         }
-        
+
         .car-image-container {
             width: 112px;
             height: 112px;
@@ -148,13 +153,13 @@
             border-radius: 14px;
             border: 1px solid rgba(0, 0, 0, 0.06);
         }
-        
+
         .car-image {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
         }
-        
+
         .car-details h4 {
             font-family: 'Poppins', sans-serif;
             font-size: 1.35rem;
@@ -163,13 +168,13 @@
             color: #1c1917;
             letter-spacing: -0.3px;
         }
-        
+
         .car-details p {
             margin: 0.25rem 0;
             font-size: 0.9rem;
             color: #57534e;
         }
-        
+
         .cost-info {
             font-size: 1.2rem !important;
             font-weight: 800 !important;
@@ -181,47 +186,72 @@
                 padding: 1.15rem;
                 gap: 1rem;
             }
+
             .car-image-container {
                 width: 72px;
                 height: 72px;
             }
+
             .car-details h4 {
                 font-size: 1.2rem;
             }
         }
-        
-        .selected-car-section {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            background: linear-gradient(135deg, rgba(222, 46, 3, 0.05), rgba(255, 87, 34, 0.05));
-            border-radius: 16px;
-            border: 2px solid rgba(222, 46, 3, 0.2);
-        }
-        
-        .selected-car-section h3 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: #1c1917;
-        }
-        
-        @media (max-width: 1024px) {
-            .page-grid {
-                grid-template-columns: 1fr;
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
             }
-            
-            .booking-panel {
-                position: static;
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
+        }
+
+        .stagger-in {
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .map-loading-skeleton {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 50%, #f3f4f6 100%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite linear;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-weight: 500;
+        }
+
+        @keyframes skeleton-loading {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .card-header {
+            border-bottom: 2px solid rgba(0, 0, 0, 0.03);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
         }
     </style>
 </head>
+
 <body>
     <!-- Modern Navigation -->
     <nav class="modern-nav">
         <div class="nav-container">
-            <a href="{{ url_for('welcome') }}" class="nav-logo" onclick="localStorage.clear(); sessionStorage.clear();">Vite<span>Go</span></a>
+            <a href="{{ url_for('welcome') }}" class="nav-logo"
+                onclick="localStorage.clear(); sessionStorage.clear();">Vite<span>Go</span></a>
             <div class="nav-actions">
                 <span class="nav-user">👋 {{ current_user.username }}</span>
                 <a href="{{ url_for('payment') }}" class="nav-btn nav-btn-secondary">Ride History</a>
@@ -262,7 +292,7 @@
                             <button type="button" class="datetime-toggle" onclick="toggleDateTimePicker()">
                                 ⏰ Schedule Pickup
                             </button>
-                            
+
                             <div id="datetimepicker" style="display: none;">
                                 <label class="form-label">Select Date and Time:</label>
                                 <input type='text' class="form-input" id="selected_datetime" value="" />
@@ -286,7 +316,8 @@
                     </form>
 
                     <!-- Route summary (used for non-driving modes) -->
-                    <div id="route-summary" style="display:none; margin-top: 1rem; padding: 1rem 1.25rem; background: rgba(255,255,255,0.75); border: 1px solid rgba(0,0,0,0.08); border-radius: 16px; color: #1c1917; font-weight: 600;">
+                    <div id="route-summary"
+                        style="display:none; margin-top: 1rem; padding: 1rem 1.25rem; background: rgba(255,255,255,0.75); border: 1px solid rgba(0,0,0,0.08); border-radius: 16px; color: #1c1917; font-weight: 600;">
                         🗺️ <span id="route-summary-text"></span>
                     </div>
 
@@ -311,7 +342,6 @@
                 </div>
             </div>
 
-            <!-- Right Panel - Map -->
             <div class="map-panel fade-in">
                 <div class="map-container">
                     <div id="map"></div>
@@ -325,7 +355,7 @@
 
     <!-- Page Scripts -->
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             var currentUsername = "{{ current_user.username }}";
             $('body').data('currentUsername', currentUsername);
         });
@@ -372,12 +402,15 @@
 
         function displayCarList(carsList, estimatedDuration, estimatedDistance) {
             var cars = '';
-            carsList.forEach(function (car) {
+            carsList.forEach(function (car, index) {
                 var carImage = carImages[car.name] || 'path/to/default_image.jpg';
                 var arrivalTime = moment(car.pickupTime, 'YYYY-MM-DD HH:mm').add(estimatedDuration, 'minutes').format('YYYY-MM-DD HH:mm');
                 var tripCost = calculateTripCost(parseFloat(estimatedDistance));
 
-                cars += '<div class="car-item" onclick="selectCar(\'' + car.name + '\', \'' + car.pickupTime + '\', \'' + arrivalTime + '\', ' + tripCost + ')">' +
+                // Add staggered animation delay
+                var delay = (index * 0.15) + 's';
+
+                cars += '<div class="car-item stagger-in" style="animation-delay: ' + delay + ';" onclick="selectCar(\'' + car.name + '\', \'' + car.pickupTime + '\', \'' + arrivalTime + '\', ' + tripCost + ')">' +
                     '<div class="car-image-container">' +
                     '<img src="' + carImage + '" alt="' + car.name + '" class="car-image">' +
                     '</div>' +
@@ -392,7 +425,7 @@
             });
 
             $('#car_list').html(cars);
-            $('#car_list').show();
+            $('#car_list').slideDown(400); // Smoother entrance than .show()
         }
 
         function showNonDrivingSummary(distanceText, durationMinutes) {
@@ -401,7 +434,7 @@
             $('#selected_car').empty();
             sessionStorage.removeItem('trip_cost');
             $('#car_list').hide().empty();
-            
+
             $('#route-summary-text').text('Distance: ' + distanceText + ' • Time: ~' + durationMinutes + ' min');
             $('#route-summary').show();
         }
@@ -516,8 +549,8 @@
             }
             navigator.geolocation.getCurrentPosition(setCurrentPosition, function (error) {
                 let msg = "Unable to get your current location.";
-                
-                switch(error.code) {
+
+                switch (error.code) {
                     case error.PERMISSION_DENIED:
                         msg = "Location access was denied. Please click the Lock icon 🔒 in your browser's address bar and set 'Location' to 'Allow'.";
                         break;
@@ -532,7 +565,7 @@
                             msg = "Geolocation requires HTTPS. Use 'localhost' or an HTTPS connection.";
                         }
                 }
-                
+
                 showToast("Location Error", msg, "error", 10000);
                 console.error('Geolocation error:', error);
             }, {
@@ -568,21 +601,13 @@
 
         function initUberMap() {
             var myLatLng = { lat: 52.520008, lng: 13.404954 };
-            map = new google.maps.Map(document.getElementById('map'), { 
-                zoom: 16, 
+            // Map initialized directly for speed
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 16,
                 center: myLatLng,
-                styles: [
-                    {
-                        "featureType": "all",
-                        "elementType": "geometry",
-                        "stylers": [{"color": "#fef7f3"}]
-                    },
-                    {
-                        "featureType": "road",
-                        "elementType": "geometry",
-                        "stylers": [{"color": "#ffffff"}]
-                    }
-                ]
+                disableDefaultUI: false,
+                mapTypeControl: false,
+                streetViewControl: false
             });
 
             var from_places = new google.maps.places.Autocomplete(document.getElementById('from_places'));
@@ -764,9 +789,9 @@
 
             function displayRoute(travel_mode, origin, destination, directionsService, directionsDisplay, directionsDisplayOutline) {
                 directionsService.route({
-                    origin: origin, 
-                    destination: destination, 
-                    travelMode: travel_mode, 
+                    origin: origin,
+                    destination: destination,
+                    travelMode: travel_mode,
                     avoidTolls: true
                 }, function (response, status) {
                     if (status === 'OK') {
@@ -915,5 +940,8 @@
             initTimePicker();
         });
     </script>
+    <!-- Google Maps Script (at the end to ensure callback exists) -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&language=en&callback=initUberMap"></script>
 </body>
+
 </html>

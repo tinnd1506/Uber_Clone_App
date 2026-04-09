@@ -27,6 +27,17 @@
                 <p class="auth-subtitle">Login to continue your journey</p>
             </div>
 
+            <!-- Visible Fallback for Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="alert-container">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} fade-in">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
             <form method="POST" id="login-form" action="{{ url_for('login', role=request.args.get('role')) }}" class="auth-form">
                 {{ form.hidden_tag() }}
                 
@@ -65,5 +76,20 @@
     </div>
 
     <script src="{{ url_for('static', filename='scripts/auth.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/modern_shared.js') }}"></script>
+    <script>
+        // Display flashed messages using premium toasts
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    const type = "{{ category }}" === "danger" ? "error" : ("{{ category }}" === "success" ? "success" : "info");
+                    const title = "{{ category }}".charAt(0).toUpperCase() + "{{ category }}".slice(1);
+                    if (window.showToast) {
+                        window.showToast(title, {{ message|tojson }}, type);
+                    }
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </script>
 </body>
 </html>

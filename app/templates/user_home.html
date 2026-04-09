@@ -1,25 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book a Ride | ViteGo</title>
-    
+
     <!-- Modern Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+
     <!-- Styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/modern_shared.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css">
-    
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css">
+
     <!-- Scripts -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyABdGoPrYmiq5r3fur6Q3kVFGUXrKTNg3s&libraries=places&language=en&callback=initUberMap"></script>
+    <script src="{{ url_for('static', filename='scripts/modern_shared.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
-    
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+
     <style>
         .page-grid {
             display: grid;
@@ -28,12 +33,12 @@
             align-items: start;
             margin-top: 3.5rem;
         }
-        
+
         .booking-panel {
             position: sticky;
             top: 140px;
         }
-        
+
         .map-container {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(30px);
@@ -42,12 +47,12 @@
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
         }
-        
+
         #map {
             width: 100%;
             height: 600px;
         }
-        
+
         .location-btn {
             display: inline-flex;
             align-items: center;
@@ -66,35 +71,40 @@
             box-shadow: 0 2px 10px rgba(222, 46, 3, 0.1);
             width: 100%;
         }
-        
+
         .location-btn:hover {
             background: linear-gradient(135deg, rgba(222, 46, 3, 0.15), rgba(255, 87, 34, 0.1));
             border-color: rgba(222, 46, 3, 0.4);
             transform: translateY(-2px);
             box-shadow: 0 4px 20px rgba(222, 46, 3, 0.2);
         }
-        
+
         .location-btn:active {
             transform: translateY(0);
             box-shadow: 0 2px 10px rgba(222, 46, 3, 0.15);
         }
-        
+
         .location-btn.loading {
             pointer-events: none;
             opacity: 0.7;
         }
-        
+
         .location-btn.loading::before {
             content: '⏳';
             margin-right: 0.5rem;
             animation: spin 0.6s linear infinite;
         }
-        
+
         @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
         }
-        
+
         .error-message {
             display: none;
             padding: 1.75rem 2rem;
@@ -113,7 +123,7 @@
             transition: all 0.3s ease;
             position: relative;
         }
-        
+
         .error-message::before {
             content: '';
             position: absolute;
@@ -123,7 +133,7 @@
             height: 1px;
             background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.5), transparent);
         }
-        
+
         .error-message::after {
             content: '';
             position: absolute;
@@ -134,70 +144,89 @@
             background: linear-gradient(180deg, #f97316, #ea580c);
             border-radius: 16px 0 0 16px;
         }
-        
+
         .error-message.show {
             display: flex;
             align-items: flex-start;
             gap: 1rem;
         }
-        
+
         .error-message span:first-child {
             font-size: 1.25rem;
             color: #6366f1;
             margin-top: 0.1rem;
             animation: gentlePulse 3s ease-in-out infinite;
         }
-        
+
         .error-message:hover {
             transform: translateY(-1px);
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
             border-color: rgba(148, 163, 184, 0.3);
         }
-        
+
         @keyframes fadeInSlide {
-            0% { 
+            0% {
                 opacity: 0;
                 transform: translateY(-10px);
             }
-            100% { 
+
+            100% {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        
+
         @keyframes gentlePulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
         }
-        
+
         .form-input.error {
             border-color: #fb923c;
             background: rgba(251, 146, 60, 0.05);
             animation: gentleShake 0.4s ease-in-out;
         }
-        
+
         .form-input.error:focus {
             border-color: #f97316;
             box-shadow: 0 0 0 4px rgba(251, 146, 60, 0.15);
         }
-        
+
         @keyframes slideDown {
-            from { 
+            from {
                 opacity: 0;
                 transform: translateY(-10px);
             }
-            to { 
+
+            to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        
+
         @keyframes gentleShake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
         }
-        
+
         .datetime-toggle {
             display: inline-flex;
             align-items: center;
@@ -212,19 +241,19 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .datetime-toggle:hover {
             border-color: #f97316;
             color: #f97316;
             background: rgba(255, 255, 255, 1);
         }
-        
+
         .datetime-toggle.active {
             border-color: #f97316;
             background: rgba(249, 115, 22, 0.1);
             color: #f97316;
         }
-        
+
         /* Time Picker Modal */
         .time-modal {
             display: none;
@@ -238,11 +267,11 @@
             justify-content: center;
             padding: 1rem;
         }
-        
+
         .time-modal.active {
             display: flex;
         }
-        
+
         .time-modal-backdrop {
             position: absolute;
             top: 0;
@@ -254,7 +283,7 @@
             animation: fadeIn 0.3s ease;
             z-index: 5001;
         }
-        
+
         .time-modal-content {
             position: relative;
             width: 100%;
@@ -268,29 +297,40 @@
             overflow: visible;
             z-index: 5002;
         }
-        
+
         @keyframes slideUpBounce {
-            0% { opacity: 0; transform: translateY(30px) scale(0.95); }
-            60% { opacity: 1; transform: translateY(-5px) scale(1.02); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
+            0% {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+
+            60% {
+                opacity: 1;
+                transform: translateY(-5px) scale(1.02);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
-        
+
         .time-modal-body {
             padding: 1.5rem 1.75rem;
             position: relative;
         }
-        
+
         .custom-time-trigger {
             margin-top: 1.25rem;
             padding-top: 1.25rem;
             border-top: 1px solid rgba(226, 232, 240, 0.6);
         }
-        
+
         .custom-time-trigger .form-label {
             font-size: 0.85rem;
             margin-bottom: 0.75rem;
         }
-        
+
         .custom-time-btn {
             width: 100%;
             display: flex;
@@ -305,22 +345,22 @@
             font-size: 0.95rem;
             color: #64748b;
         }
-        
+
         .custom-time-btn:hover {
             border-color: rgba(249, 115, 22, 0.4);
             background: rgba(255, 255, 255, 0.9);
         }
-        
+
         .custom-time-btn.active {
             border-color: #f97316;
             background: rgba(249, 115, 22, 0.1);
             color: #ea580c;
         }
-        
+
         .calendar-icon {
             font-size: 1.25rem;
         }
-        
+
         /* Custom Time Popup - ABOVE EVERYTHING INCLUDING MAP */
         .custom-time-popup {
             position: fixed !important;
@@ -338,22 +378,23 @@
             isolation: isolate !important;
             padding: 1rem !important;
         }
-        
+
         .custom-time-popup.active {
             display: block !important;
         }
-        
+
         @keyframes popupSlide {
             from {
                 opacity: 0;
                 transform: translate(-50%, -50%) scale(0.9);
             }
+
             to {
                 opacity: 1;
                 transform: translate(-50%, -50%) scale(1);
             }
         }
-        
+
         #inline-calendar .bootstrap-datetimepicker-widget {
             position: static !important;
             display: block !important;
@@ -361,57 +402,57 @@
             border: none !important;
             width: 100% !important;
         }
-        
+
         #inline-calendar .bootstrap-datetimepicker-widget table {
             font-size: 0.9rem;
         }
-        
+
         #inline-calendar .bootstrap-datetimepicker-widget table th {
             font-weight: 600;
             color: #64748b;
             padding: 0.5rem;
         }
-        
+
         #inline-calendar .bootstrap-datetimepicker-widget table td {
             padding: 0.5rem;
             border-radius: 8px;
         }
-        
+
         #inline-calendar .bootstrap-datetimepicker-widget table td.day:hover {
             background: rgba(234, 88, 12, 0.1) !important;
             color: #ea580c !important;
         }
-        
+
         #inline-calendar .bootstrap-datetimepicker-widget table td.active,
         #inline-calendar .bootstrap-datetimepicker-widget table td.active:hover {
             background: linear-gradient(135deg, #f97316, #ea580c) !important;
             color: white !important;
             box-shadow: 0 4px 10px rgba(234, 88, 12, 0.3);
         }
-        
+
         #inline-calendar .bootstrap-datetimepicker-widget .picker-switch {
             font-size: 1.1rem;
             font-weight: 600;
             color: #334155;
         }
-        
+
         #inline-calendar .bootstrap-datetimepicker-widget .prev,
         #inline-calendar .bootstrap-datetimepicker-widget .next {
             font-size: 1.2rem;
             color: #ea580c;
         }
-        
+
         #inline-calendar .bootstrap-datetimepicker-widget .timepicker {
             padding: 1rem;
         }
-        
+
         #inline-calendar .bootstrap-datetimepicker-widget .timepicker-hour,
         #inline-calendar .bootstrap-datetimepicker-widget .timepicker-minute {
             font-size: 1.5rem;
             font-weight: 600;
             color: #334155;
         }
-        
+
         /* Time picker - Simple arrows - KILL ALL EFFECTS */
         #inline-calendar .bootstrap-datetimepicker-widget .timepicker .btn {
             all: unset !important;
@@ -438,7 +479,7 @@
             border: none !important;
             pointer-events: auto !important;
         }
-        
+
         #inline-calendar .bootstrap-datetimepicker-widget .timepicker .btn:hover,
         #inline-calendar .bootstrap-datetimepicker-widget .timepicker .btn:active,
         #inline-calendar .bootstrap-datetimepicker-widget .timepicker .btn:focus {
@@ -466,14 +507,14 @@
             border: none !important;
             pointer-events: auto !important;
         }
-        
+
         #inline-calendar .bootstrap-datetimepicker-widget .timepicker .btn span {
             color: #ea580c !important;
             font-size: 1.4rem !important;
             font-weight: 600 !important;
             line-height: 1 !important;
         }
-        
+
         .time-modal-header {
             display: flex;
             align-items: center;
@@ -481,7 +522,7 @@
             padding: 1.5rem 1.75rem;
             border-bottom: 1px solid rgba(226, 232, 240, 0.6);
         }
-        
+
         .time-modal-header h3 {
             font-family: 'Poppins', sans-serif;
             font-size: 1.15rem;
@@ -489,7 +530,7 @@
             color: #334155;
             margin: 0;
         }
-        
+
         .time-modal-close {
             width: 32px;
             height: 32px;
@@ -504,23 +545,23 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        
+
         .time-modal-close:hover {
             background: rgba(226, 232, 240, 1);
             color: #334155;
         }
-        
+
         .time-modal-body {
             padding: 1.5rem 1.75rem;
         }
-        
+
         .quick-time-options {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 0.75rem;
             margin-bottom: 1.5rem;
         }
-        
+
         .quick-time-btn {
             display: flex;
             flex-direction: column;
@@ -533,72 +574,72 @@
             cursor: pointer;
             transition: all 0.25s ease;
         }
-        
+
         .quick-time-btn:hover {
             background: rgba(255, 255, 255, 0.9);
             border-color: rgba(249, 115, 22, 0.3);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.1);
         }
-        
+
         .quick-time-btn.active {
             background: rgba(249, 115, 22, 0.1);
             border-color: #f97316;
         }
-        
+
         .quick-icon {
             font-size: 1.5rem;
         }
-        
+
         .quick-time-btn span:nth-child(2) {
             font-size: 0.85rem;
             font-weight: 600;
             color: #334155;
         }
-        
+
         .quick-time-btn small {
             font-size: 0.75rem;
             color: #64748b;
         }
-        
+
         .custom-time-section {
             padding-top: 1rem;
             border-top: 1px solid rgba(226, 232, 240, 0.6);
             position: relative;
         }
-        
+
         .custom-time-section .form-label {
             font-size: 0.85rem;
             margin-bottom: 0.75rem;
         }
-        
+
         .time-input {
             text-align: center;
             font-size: 1rem;
             position: relative;
             z-index: 10;
         }
-        
+
         /* Fix datetimepicker visibility in modal */
         .bootstrap-datetimepicker-widget {
             z-index: 3000 !important;
             position: absolute !important;
         }
-        
+
         .bootstrap-datetimepicker-widget.dropdown-menu {
             z-index: 3000 !important;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
             border: 1px solid rgba(226, 232, 240, 0.8) !important;
             border-radius: 16px !important;
         }
-        
+
         .time-modal-footer {
             display: flex;
             gap: 0.75rem;
             padding: 1rem 1.75rem 1.5rem;
             border-top: 1px solid rgba(226, 232, 240, 0.6);
         }
-        
+
         /* Car Selection Modal */
         .car-modal {
             display: none;
@@ -614,25 +655,30 @@
             padding: 2rem;
             pointer-events: none;
             background: radial-gradient(1200px 800px at 20% 10%, rgba(255, 87, 34, 0.22), transparent 55%),
-                        radial-gradient(1000px 700px at 80% 20%, rgba(222, 46, 3, 0.18), transparent 55%),
-                        rgba(8, 8, 8, 0.55);
+                radial-gradient(1000px 700px at 80% 20%, rgba(222, 46, 3, 0.18), transparent 55%),
+                rgba(8, 8, 8, 0.55);
             backdrop-filter: blur(10px);
         }
-        
+
         .car-modal .car-list {
             pointer-events: auto;
         }
-        
+
         .car-modal.active {
             display: flex;
             pointer-events: auto;
         }
-        
+
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
-        
+
         .car-modal .car-list {
             max-width: 600px;
             width: 100%;
@@ -648,24 +694,26 @@
         .car-modal .car-list::-webkit-scrollbar {
             width: 10px;
         }
+
         .car-modal .car-list::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.18);
             border: 2px solid rgba(0, 0, 0, 0);
             background-clip: padding-box;
             border-radius: 999px;
         }
-        
+
         @keyframes slideUp {
-            from { 
+            from {
                 opacity: 0;
                 transform: translateY(50px) scale(0.95);
             }
-            to { 
+
+            to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
             }
         }
-        
+
         .car-item {
             display: flex;
             gap: 2rem;
@@ -690,7 +738,7 @@
             transition: opacity 0.3s ease;
             pointer-events: none;
         }
-        
+
         .car-item:hover {
             border-color: rgba(99, 102, 241, 0.3);
             transform: translateY(-2px);
@@ -700,12 +748,12 @@
         .car-item:hover::before {
             opacity: 1;
         }
-        
+
         .car-item.selected {
             border-color: rgba(16, 185, 129, 0.4);
             box-shadow: 0 12px 40px rgba(16, 185, 129, 0.12);
         }
-        
+
         .car-image-container {
             width: 120px;
             height: 120px;
@@ -718,7 +766,7 @@
             flex-shrink: 0;
             border: 1px solid rgba(226, 232, 240, 0.5);
         }
-        
+
         .car-image {
             max-width: 100%;
             max-height: 100%;
@@ -726,18 +774,18 @@
             filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.08));
             transition: transform 0.3s ease;
         }
-        
+
         .car-item:hover .car-image {
             transform: scale(1.05);
         }
-        
+
         .car-details {
             flex: 1;
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
         }
-        
+
         .car-details h4 {
             font-family: 'Poppins', sans-serif;
             font-size: 1.35rem;
@@ -758,13 +806,13 @@
             font-weight: 500;
             color: #64748b;
         }
-        
+
         .car-info-icon {
             font-size: 1.1rem;
             color: #6366f1;
             filter: drop-shadow(0 1px 2px rgba(99, 102, 241, 0.15));
         }
-        
+
         .car-badge {
             padding: 0.25rem 0.75rem;
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
@@ -776,7 +824,7 @@
             letter-spacing: 0.8px;
             box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
         }
-        
+
         .cost-info {
             font-size: 1.6rem !important;
             font-weight: 700 !important;
@@ -790,22 +838,26 @@
             .car-modal {
                 padding: 1rem;
             }
+
             .car-item {
                 padding: 1.25rem;
                 gap: 1rem;
             }
+
             .car-image-container {
                 width: 84px;
                 height: 84px;
             }
+
             .car-details h4 {
                 font-size: 1.35rem;
             }
+
             .cost-info {
                 font-size: 1.6rem !important;
             }
         }
-        
+
         .selected-car-section {
             margin-top: 2.5rem;
             padding: 2rem 2.5rem;
@@ -813,23 +865,24 @@
             backdrop-filter: blur(30px);
             border-radius: 28px;
             border: 1px solid rgba(16, 185, 129, 0.25);
-            box-shadow: 
+            box-shadow:
                 0 8px 32px rgba(16, 185, 129, 0.12),
                 0 2px 8px rgba(16, 185, 129, 0.08);
             animation: slideUpFade 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
+
         @keyframes slideUpFade {
             from {
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        
+
         .selected-car-header {
             display: flex;
             align-items: center;
@@ -838,7 +891,7 @@
             padding-bottom: 1rem;
             border-bottom: 1px solid rgba(16, 185, 129, 0.15);
         }
-        
+
         .check-icon {
             width: 36px;
             height: 36px;
@@ -852,7 +905,7 @@
             font-weight: 700;
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
         }
-        
+
         .selected-car-header h3 {
             font-family: 'Poppins', sans-serif;
             font-size: 1.25rem;
@@ -860,13 +913,13 @@
             color: #334155;
             margin: 0;
         }
-        
+
         .selected-car-actions {
             display: flex;
             gap: 1rem;
             margin-top: 1.5rem;
         }
-        
+
         .btn-action {
             flex: 1;
             display: flex;
@@ -883,56 +936,59 @@
             border: none;
             white-space: nowrap;
         }
-        
+
         .btn-action-secondary {
             background: #f1f5f9;
             color: #475569;
             border: 1px solid #e2e8f0;
         }
-        
+
         .btn-action-secondary:hover {
             background: #e2e8f0;
             color: #334155;
             border-color: #cbd5e1;
         }
-        
+
         .btn-action-primary {
             background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
             color: #ffffff;
             box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4);
         }
-        
+
         .btn-action-primary:hover {
             background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
             box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
             transform: translateY(-1px);
         }
-        
+
         .btn-icon {
             font-size: 1rem;
         }
-        
+
         @media (max-width: 1024px) {
             .page-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .booking-panel {
                 position: static;
             }
         }
     </style>
 </head>
+
 <body>
     <!-- Modern Navigation -->
     <nav class="modern-nav">
         <div class="nav-container">
-            <a href="{{ url_for('welcome') }}" class="nav-logo" onclick="localStorage.clear(); sessionStorage.clear();">Vite<span>Go</span></a>
+            <a href="{{ url_for('welcome') }}" class="nav-logo"
+                onclick="localStorage.clear(); sessionStorage.clear();">Vite<span>Go</span></a>
             <div class="nav-actions">
                 <span class="nav-user">👋 {{ current_user.username }}</span>
                 <a href="{{ url_for('payment') }}" class="nav-btn nav-btn-secondary">Ride History</a>
                 <a href="{{ url_for('chat') }}" class="nav-btn nav-btn-secondary">My Rides</a>
-                <a href="{{ url_for('logout') }}" class="nav-btn nav-btn-primary" onclick="localStorage.clear();">Logout</a>
+                <a href="{{ url_for('logout') }}" class="nav-btn nav-btn-primary"
+                    onclick="localStorage.clear();">Logout</a>
             </div>
         </div>
     </nav>
@@ -954,9 +1010,10 @@
                             <span>⚠️</span>
                             <span id="error-text"></span>
                         </div>
-                        
+
                         <!-- Route summary (used for non-driving modes) -->
-                        <div id="route-summary" class="error-message" style="background: rgba(255,255,255,0.75); border-color: rgba(0,0,0,0.08); color: #1c1917;">
+                        <div id="route-summary" class="error-message"
+                            style="background: rgba(255,255,255,0.75); border-color: rgba(0,0,0,0.08); color: #1c1917;">
                             <span>🗺️</span>
                             <span id="route-summary-text"></span>
                         </div>
@@ -990,7 +1047,8 @@
                             <div class="time-modal-content">
                                 <div class="time-modal-header">
                                     <h3>🕐 Schedule Your Pickup</h3>
-                                    <button type="button" class="time-modal-close" onclick="closeTimePickerModal()">✕</button>
+                                    <button type="button" class="time-modal-close"
+                                        onclick="closeTimePickerModal()">✕</button>
                                 </div>
                                 <div class="time-modal-body">
                                     <div class="quick-time-options">
@@ -1021,12 +1079,15 @@
                                 </div>
                                 <!-- Custom Time Popup -->
                                 <div id="customTimePopup" class="custom-time-popup">
-                                    <button type="button" class="popup-close-simple" onclick="closeCustomTimePopup()">✕</button>
+                                    <button type="button" class="popup-close-simple"
+                                        onclick="closeCustomTimePopup()">✕</button>
                                     <div id="inline-calendar"></div>
                                 </div>
                                 <div class="time-modal-footer">
-                                    <button type="button" class="btn-action btn-action-secondary" onclick="closeTimePickerModal()">Cancel</button>
-                                    <button type="button" class="btn-action btn-action-primary" onclick="confirmTimeSelection()">Confirm Time</button>
+                                    <button type="button" class="btn-action btn-action-secondary"
+                                        onclick="closeTimePickerModal()">Cancel</button>
+                                    <button type="button" class="btn-action btn-action-primary"
+                                        onclick="confirmTimeSelection()">Confirm Time</button>
                                 </div>
                             </div>
                         </div>
@@ -1087,17 +1148,17 @@
 
     <!-- Page Scripts -->
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             var currentUsername = "{{ current_user.username }}";
             $('body').data('currentUsername', currentUsername);
-            
+
             // Restore saved locations from localStorage with delay
-            setTimeout(function() {
+            setTimeout(function () {
                 var savedPickup = localStorage.getItem('saved_pickup_location');
                 var savedDropoff = localStorage.getItem('saved_dropoff_location');
                 var savedOrigin = localStorage.getItem('saved_origin');
                 var savedDestination = localStorage.getItem('saved_destination');
-                
+
                 if (savedPickup) {
                     $('#from_places').val(savedPickup);
                 }
@@ -1111,22 +1172,22 @@
                     $('#destination').val(savedDestination);
                 }
             }, 100);
-            
+
             // Save locations when user types
-            $('#from_places').on('input', function() {
+            $('#from_places').on('input', function () {
                 localStorage.setItem('saved_pickup_location', $(this).val());
             });
-            
-            $('#to_places').on('input', function() {
+
+            $('#to_places').on('input', function () {
                 localStorage.setItem('saved_dropoff_location', $(this).val());
             });
-            
+
             // Save hidden fields when they change
-            $('#origin').on('change', function() {
+            $('#origin').on('change', function () {
                 localStorage.setItem('saved_origin', $(this).val());
             });
-            
-            $('#destination').on('change', function() {
+
+            $('#destination').on('change', function () {
                 localStorage.setItem('saved_destination', $(this).val());
             });
         });
@@ -1142,7 +1203,7 @@
 
         function openTimePickerModal() {
             $('#timePickerModal').addClass('active');
-            
+
             // Initialize inline calendar in the right panel
             var initialDate = moment().add(5, 'minutes');
             if (!$('#inline-calendar').data('DateTimePicker')) {
@@ -1164,22 +1225,22 @@
                         close: 'fa fa-times'
                     }
                 });
-                
+
                 // Update custom_datetime when calendar changes
-                $('#inline-calendar').on('dp.change', function(e) {
+                $('#inline-calendar').on('dp.change', function (e) {
                     var selectedTime = e.date.format('YYYY-MM-DD HH:mm');
                     $('#custom_datetime').val(selectedTime);
                     $('#selected_datetime').val(selectedTime);
-                    
+
                     // Update display
                     var displayTime = e.date.format('MMM D, h:mm A');
                     $('#display_time').text(displayTime);
-                    
+
                     // Clear quick button selection
                     $('.quick-time-btn').removeClass('active');
                 });
             }
-            
+
             // Set default if no time selected - default to "Now" (5 min)
             if (!$('#selected_datetime').val()) {
                 setQuickTime(5);
@@ -1195,11 +1256,11 @@
             var selectedTime = moment().add(minutes, 'minutes').format('YYYY-MM-DD HH:mm');
             $('#custom_datetime').val(selectedTime);
             $('#selected_datetime').val(selectedTime);
-            
+
             // Update display text
             var displayText = moment().add(minutes, 'minutes').format('MMM D, h:mm A');
             $('#display_time').text(displayText);
-            
+
             // Visual feedback on buttons
             $('.quick-time-btn').removeClass('active');
             if (minutes === 5) {
@@ -1225,7 +1286,7 @@
         function toggleCustomTimePopup() {
             var popup = $('#customTimePopup');
             var btn = $('.custom-time-btn');
-            
+
             if (popup.hasClass('active')) {
                 closeCustomTimePopup();
             } else {
@@ -1233,27 +1294,27 @@
                 if (!popup.parent().is('body')) {
                     popup.appendTo('body');
                 }
-                
+
                 // Clear any existing calendar HTML and destroy old instance
                 $('#inline-calendar').empty();
                 if ($('#inline-calendar').data('DateTimePicker')) {
                     $('#inline-calendar').data('DateTimePicker').destroy();
                 }
                 $('#inline-calendar').removeData('DateTimePicker');
-                
+
                 // Show popup first
                 popup.addClass('active');
                 btn.addClass('active');
-                
+
                 // Update display text to current time immediately
                 var currentMinDate = moment().add(5, 'minutes');
                 var displayTime = currentMinDate.format('MMM D, h:mm A');
                 $('#display_time').text(displayTime);
                 $('#custom_datetime').val(currentMinDate.format('YYYY-MM-DD HH:mm'));
                 $('#selected_datetime').val(currentMinDate.format('YYYY-MM-DD HH:mm'));
-                
+
                 // Initialize calendar AFTER popup is visible
-                setTimeout(function() {
+                setTimeout(function () {
                     var nowDate = moment().add(5, 'minutes');
                     $('#inline-calendar').datetimepicker({
                         format: 'YYYY-MM-DD HH:mm',
@@ -1262,16 +1323,16 @@
                         inline: true,
                         sideBySide: true
                     });
-                    
+
                     // Force the date immediately after creation
                     var picker = $('#inline-calendar').data('DateTimePicker');
                     if (picker) {
                         picker.date(nowDate);
                         picker.viewDate(nowDate);
                     }
-                    
+
                     // Remove button styles
-                    $('#inline-calendar .timepicker .btn').each(function() {
+                    $('#inline-calendar .timepicker .btn').each(function () {
                         this.style.cssText = '';
                     });
                 }, 50);
@@ -1284,7 +1345,7 @@
         }
 
         // Close popup when clicking outside
-        $(document).on('click', function(e) {
+        $(document).on('click', function (e) {
             if (!$(e.target).closest('.custom-time-popup, .custom-time-btn').length) {
                 if ($('#customTimePopup').hasClass('active')) {
                     closeCustomTimePopup();
@@ -1293,7 +1354,7 @@
         });
 
         // Close modal on ESC key
-        $(document).on('keydown', function(e) {
+        $(document).on('keydown', function (e) {
             if (e.key === 'Escape' && $('#timePickerModal').hasClass('active')) {
                 closeTimePickerModal();
             }
@@ -1350,30 +1411,30 @@
             sessionStorage.removeItem('trip_cost');
             closeCarModal();
             $('#car_list').hide().empty();
-            
+
             $('#route-summary-text').text('Distance: ' + distanceText + ' • Time: ~' + durationMinutes + ' min');
             $('#route-summary').addClass('show');
         }
-        
+
         function openCarModal() {
             $('#carModal').addClass('active');
             document.body.style.overflow = 'hidden';
         }
-        
+
         function closeCarModal() {
             $('#carModal').removeClass('active');
             document.body.style.overflow = '';
         }
-        
+
         // Close modal when clicking outside
-        $('#carModal').on('click', function(e) {
+        $('#carModal').on('click', function (e) {
             if (e.target.id === 'carModal') {
                 closeCarModal();
             }
         });
 
         // Close modal on ESC key
-        $(document).on('keydown', function(e) {
+        $(document).on('keydown', function (e) {
             if (e.key === 'Escape' && $('#carModal').hasClass('active')) {
                 closeCarModal();
             }
@@ -1397,7 +1458,7 @@
             $('#selected_car').html(selectedCarHtml);
             $('#ride_request').show();
             sessionStorage.setItem('trip_cost', tripCost);
-            
+
             // Close modal and scroll to selected car
             closeCarModal();
             setTimeout(() => {
@@ -1492,15 +1553,15 @@
                 alert('Geolocation is not supported by this browser.');
                 return;
             }
-            
+
             // Add loading state
             const locationBtn = $('.location-btn');
             const originalText = locationBtn.html();
             locationBtn.addClass('loading');
             locationBtn.html('Getting your location...');
-            
+
             navigator.geolocation.getCurrentPosition(
-                function(pos) {
+                function (pos) {
                     setCurrentPosition(pos);
                     // Remove loading state on success
                     setTimeout(() => {
@@ -1510,14 +1571,14 @@
                             locationBtn.html(originalText);
                         }, 1000);
                     }, 200);
-                }, 
+                },
                 function (error) {
                     // Remove loading state on error
                     locationBtn.removeClass('loading');
                     locationBtn.html(originalText);
-                    
+
                     let msg = "Unable to get your current location.";
-                    switch(error.code) {
+                    switch (error.code) {
                         case error.PERMISSION_DENIED:
                             msg = "Location access was denied. Please click the Lock icon 🔒 in your address bar and set 'Location' to 'Allow'.";
                             break;
@@ -1532,14 +1593,14 @@
                                 msg = "Geolocation requires HTTPS. Please access via 'localhost' or an HTTPS connection.";
                             }
                     }
-                    
+
                     showToast("Location Error", msg, "error", 10000);
                     console.error('Geolocation error:', error);
                 }, {
-                    enableHighAccuracy: true,
-                    timeout: 8000,
-                    maximumAge: 0
-                }
+                enableHighAccuracy: true,
+                timeout: 8000,
+                maximumAge: 0
+            }
             );
         }
 
@@ -1571,21 +1632,13 @@
 
         function initUberMap() {
             var myLatLng = { lat: 52.520008, lng: 13.404954 };
-            map = new google.maps.Map(document.getElementById('map'), { 
-                zoom: 16, 
+            // Map initialized directly for speed
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 16,
                 center: myLatLng,
-                styles: [
-                    {
-                        "featureType": "all",
-                        "elementType": "geometry",
-                        "stylers": [{"color": "#fef7f3"}]
-                    },
-                    {
-                        "featureType": "road",
-                        "elementType": "geometry",
-                        "stylers": [{"color": "#ffffff"}]
-                    }
-                ]
+                disableDefaultUI: false,
+                mapTypeControl: false,
+                streetViewControl: false
             });
 
             var from_places = new google.maps.places.Autocomplete(document.getElementById('from_places'));
@@ -1596,7 +1649,7 @@
                     var place = input.getPlace();
                     var address = place.formatted_address;
                     $(output).val(address);
-                    
+
                     // Save to localStorage when autocomplete selects a place
                     if (output === '#origin') {
                         localStorage.setItem('saved_origin', address);
@@ -1770,9 +1823,9 @@
 
             function displayRoute(travel_mode, origin, destination, directionsService, directionsDisplay, directionsDisplayOutline) {
                 directionsService.route({
-                    origin: origin, 
-                    destination: destination, 
-                    travelMode: travel_mode, 
+                    origin: origin,
+                    destination: destination,
+                    travelMode: travel_mode,
                     avoidTolls: true
                 }, function (response, status) {
                     if (status === 'OK') {
@@ -1794,7 +1847,7 @@
                         }
                         directionsDisplay.setMap(null);
                         directionsDisplay.setDirections(null);
-                        
+
                         // Show user-friendly error message
                         var errorMessage = '';
                         if (status === 'ZERO_RESULTS') {
@@ -1806,11 +1859,11 @@
                         } else {
                             errorMessage = '❌ Unable to calculate route. Please check your locations and try again.';
                         }
-                        
+
                         // Use the existing error display system
                         $('#error-text').text(errorMessage);
                         $('#validation-error').addClass('show');
-                        
+
                         // Auto-hide after 5 seconds
                         setTimeout(() => {
                             $('#validation-error').removeClass('show');
@@ -1846,11 +1899,11 @@
                     } else {
                         errorMessage = '❌ Unable to calculate route. Please check your locations and try again.';
                     }
-                    
+
                     // Use the existing error display system
                     $('#error-text').text(errorMessage);
                     $('#validation-error').addClass('show');
-                    
+
                     // Auto-hide after 5 seconds
                     setTimeout(() => {
                         $('#validation-error').removeClass('show');
@@ -1900,7 +1953,7 @@
                         // Use user-friendly error message instead of technical details
                         $('#error-text').text('❌ Unable to process route information. Please try again.');
                         $('#validation-error').addClass('show');
-                        
+
                         // Auto-hide after 5 seconds
                         setTimeout(() => {
                             $('#validation-error').removeClass('show');
@@ -1914,61 +1967,61 @@
                 const errorDiv = $('#validation-error');
                 const errorText = $('#error-text');
                 const field = $('#' + fieldId);
-                
+
                 errorText.text(message);
                 errorDiv.addClass('show');
                 field.addClass('error');
-                
+
                 // Auto-hide after 4 seconds
                 setTimeout(() => {
                     errorDiv.removeClass('show');
                 }, 4000);
-                
+
                 // Remove error styling when user starts typing
-                field.one('input', function() {
+                field.one('input', function () {
                     $(this).removeClass('error');
                 });
             }
 
             $('#distance_form').submit(function (e) {
                 e.preventDefault();
-                
+
                 // Clear previous errors
                 $('#validation-error').removeClass('show');
                 $('#route-summary').removeClass('show');
                 $('#from_places, #to_places').removeClass('error');
-                
+
                 var origin = $('#origin').val();
                 var destination = $('#destination').val();
                 var fromPlaces = $('#from_places').val();
                 var toPlaces = $('#to_places').val();
-                
+
                 // Validate pickup location
                 if (!fromPlaces || !fromPlaces.trim()) {
                     showError('Please enter a pickup location', 'from_places');
                     $('#from_places').focus();
                     return;
                 }
-                
+
                 if (!origin || !origin.trim()) {
                     showError('Please select a valid pickup location from the dropdown', 'from_places');
                     $('#from_places').focus();
                     return;
                 }
-                
+
                 // Validate dropoff location
                 if (!toPlaces || !toPlaces.trim()) {
                     showError('Please enter a dropoff location', 'to_places');
                     $('#to_places').focus();
                     return;
                 }
-                
+
                 if (!destination || !destination.trim()) {
                     showError('Please select a valid dropoff location from the dropdown', 'to_places');
                     $('#to_places').focus();
                     return;
                 }
-                
+
                 var travel_mode = $('#travel_mode').val();
                 var pickupTimeInput = $('#selected_datetime');
                 var pickupTime;
@@ -2022,5 +2075,8 @@
 
         });
     </script>
+    <!-- Google Maps Script (at the end to ensure callback exists) -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&language=en&callback=initUberMap"></script>
 </body>
+
 </html>

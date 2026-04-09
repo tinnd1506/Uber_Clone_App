@@ -27,6 +27,17 @@
                 <p class="auth-subtitle">Create your account and start your journey</p>
             </div>
 
+            <!-- Visible Fallback for Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="alert-container">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} fade-in">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
             <form method="POST" id="register-form" action="{{ url_for('register', role=request.args.get('role')) }}" class="auth-form">
                 {{ form.hidden_tag() }}
                 
@@ -40,7 +51,7 @@
 
                 <div class="form-group">
                     <label class="form-label" for="email">{{ form.email.label }}</label>
-                    {{ form.email(class="form-input", id="email", placeholder="Enter your email") }}
+                    {{ form.email(class="form-input", id="email", type="email", placeholder="Enter your email") }}
                     {% for error in form.email.errors %}
                         <p class="error-message">{{ error }}</p>
                     {% endfor %}
@@ -50,6 +61,14 @@
                     <label class="form-label" for="password">{{ form.password.label }}</label>
                     {{ form.password(class="form-input", id="password", placeholder="Create a password") }}
                     {% for error in form.password.errors %}
+                        <p class="error-message">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="confirm_password">{{ form.confirm_password.label }}</label>
+                    {{ form.confirm_password(class="form-input", id="confirm_password", placeholder="Confirm your password") }}
+                    {% for error in form.confirm_password.errors %}
                         <p class="error-message">{{ error }}</p>
                     {% endfor %}
                 </div>
@@ -73,5 +92,19 @@
     </div>
 
     <script src="{{ url_for('static', filename='scripts/auth.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/modern_shared.js') }}"></script>
+    <script>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    const type = "{{ category }}" === "danger" ? "error" : ("{{ category }}" === "success" ? "success" : "info");
+                    const title = "{{ category }}".charAt(0).toUpperCase() + "{{ category }}".slice(1);
+                    if (window.showToast) {
+                        window.showToast(title, {{ message|tojson }}, type);
+                    }
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </script>
 </body>
 </html>
