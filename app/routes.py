@@ -354,8 +354,12 @@ def send_payment_confirmation_email(to_email, payment_info):
         subject = 'ViteGo Receipt - Payment Confirmation'
         body = f'Thank you for your payment. Here is your receipt information:\n\nRide Cost: ${payment_info}\n\nThank you for riding with ViteGo!'
 
-        brevo_api_key = app.config.get('BREVO_API_KEY')
-        sender_email = app.config.get('MAIL_DEFAULT_SENDER')
+        brevo_api_key = app.config.get('BREVO_API_KEY') or os.environ.get('BREVO_API_KEY')
+        sender_email = app.config.get('MAIL_DEFAULT_SENDER') or os.environ.get('MAIL_DEFAULT_SENDER')
+
+        if not brevo_api_key or not sender_email:
+            print(f"Email error: BREVO_API_KEY={'set' if brevo_api_key else 'MISSING'}, MAIL_DEFAULT_SENDER={'set' if sender_email else 'MISSING'}")
+            return False
 
         import sib_api_v3_sdk
         from sib_api_v3_sdk.rest import ApiException
