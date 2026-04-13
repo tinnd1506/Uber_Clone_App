@@ -1,9 +1,6 @@
 from flask import render_template, request, flash, redirect, url_for, jsonify, session
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Email
 import requests
 from pymongo import MongoClient
 from bson import ObjectId
@@ -12,7 +9,6 @@ from app import app
 from app.models import User  
 from app.database import setup_sqlite
 from flask_socketio import SocketIO, emit
-from flask_mail import Mail, Message
 from app.forms import RegistrationForm, LoginForm
 from app import Config 
 from app.database import setup_sqlite, setup_mongo
@@ -24,8 +20,6 @@ import time
 toolbar = DebugToolbarExtension(app)
 
 app.config.from_object(Config)
-
-mail = Mail(app)
 
 socketio = SocketIO(app)
 
@@ -357,17 +351,27 @@ def get_user_email(user_id):
 
 def send_payment_confirmation_email(to_email, payment_info):
     try:
-        print(f"EMAIL DEBUG: Attempting to send to {to_email}")
-        print(f"EMAIL DEBUG: Config - SERVER={app.config.get('MAIL_SERVER')}, PORT={app.config.get('MAIL_PORT')}, USERNAME={app.config.get('MAIL_USERNAME')}")
-        
         subject = 'ViteGo Receipt - Payment Confirmation'
         body = f'Thank you for your payment. Here is your receipt information:\n\nRide Cost: ${payment_info}\n\nThank you for riding with ViteGo!'
 
-        msg = Message(subject, sender=app.config.get('MAIL_USERNAME'), recipients=[to_email])
-        msg.body = body
+        brevo_api_key = app.config.get('BREVO_API_KEY')
+        sender_email = app.config.get('MAIL_DEFAULT_SENDER')
 
-        mail.send(msg)
-        print(f"Email sent successfully to {to_email}")
+        import sib_api_v3_sdk
+        from sib_api_v3_sdk.rest import ApiException
+
+        configuration = sib_api_v3_sdk.Configuration()
+        configuration.api_key['api-key'] = brevo_api_key
+
+        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+            sender={'name': 'ViteGo', 'email': sender_email},
+            to=[{'email': to_email}],
+            subject=subject,
+            text_content=body,
+        )
+
+        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+        api_instance.send_transac_email(send_smtp_email)
         return True
     except Exception as e:
         print(f"Error sending email: {str(e)}")

@@ -2,10 +2,10 @@ Flask==3.0.3
 Werkzeug==3.0.3
 Flask-Login==0.6.3
 Flask-WTF==1.2.1
-Flask-Mail==0.9.1
 Flask-SocketIO==5.3.6
 Flask-DebugToolbar==0.15.1
 python-dotenv==0.19.2
 pymongo[srv]==3.12.1
 requests==2.26.0
 email_validator==2.1.0
+sib-api-v3-sdk==7.6.0

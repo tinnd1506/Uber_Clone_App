@@ -454,22 +454,23 @@ function save_results(response, status) {
                 { name: 'ViteGo XL', pickupTime: pickupTime.format('YYYY-MM-DD HH:mm') },
             ];
 
-            var distance = response.rows[0].elements[0].distance.text;
+            var distanceText = response.rows[0].elements[0].distance.text;
+            var distanceInKm = response.rows[0].elements[0].distance.value / 1000;
             var durationInSeconds = response.rows[0].elements[0].duration.value;
             var durationInMinutes = Math.ceil(durationInSeconds / 60);
 
-            console.log('Distance:', distance);
+            console.log('Distance:', distanceText);
             console.log('Duration in minutes:', durationInMinutes);
 
-            var tripCost = calculateTripCost(parseFloat(distance));
+            var tripCost = calculateTripCost(distanceInKm);
 
             var travel_mode = $('#travel_mode').val();
             if (travel_mode && travel_mode.toUpperCase() !== 'DRIVING') {
-                showNonDrivingSummary(distance, durationInMinutes);
+                showNonDrivingSummary(distanceText, durationInMinutes);
                 return;
             }
 
-            displayCarList(carsList, durationInMinutes, parseFloat(distance));
+            displayCarList(carsList, durationInMinutes, distanceInKm);
         } catch (error) {
             console.error("Error processing API response:", error);
             $('#result').html("Error processing API response: " + error.message);
