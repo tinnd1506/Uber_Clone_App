@@ -391,6 +391,8 @@ def confirm_payment():
         # Get trip cost from form or session fallback
         trip_cost = request.form.get('trip_cost') or session.get('trip_cost', 'N/A')
 
+        print(f"CONFIRM_PAYMENT: email={user_email}, trip_cost={trip_cost}, brevo_key={'set' if app.config.get('BREVO_API_KEY') or os.environ.get('BREVO_API_KEY') else 'MISSING'}")
+
         if user_email and trip_cost != 'N/A':
             # Mark ride as completed in DB
             db['rides'].update_one(
